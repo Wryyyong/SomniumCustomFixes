@@ -1,6 +1,6 @@
-global using MelonLoader;
-
 global using HarmonyLib;
+
+using MelonLoader;
 
 using SomniumCustomFixes;
 
@@ -46,5 +46,6 @@ class SomniumMelon : MelonMod {
 		Logger = LoggerInstance;
 
 		GeneralQualityFixes.Init();
+		UACDFixes.Init();
 	}
 }

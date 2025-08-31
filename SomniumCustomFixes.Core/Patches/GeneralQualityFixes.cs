@@ -63,11 +63,13 @@ static class GeneralQualityFixes {
 			name: nameof(QualitySettings.shadowCascades),
 			trgt: 4
 		),
+		/*
 		new(
 			type: typeof(QualitySettings),
 			name: nameof(QualitySettings.shadowDistance),
 			trgt: 130f
 		),
+		*/
 		new(
 			type: typeof(QualitySettings),
 			name: nameof(QualitySettings.shadowProjection),
@@ -92,8 +94,10 @@ static class GeneralQualityFixes {
 		object[] paramList = [null];
 
 		foreach (SettingInfo info in SettingsIndex) {
-			MethodInfo setter = info.Property.SetMethod;
-			object defaultVal = info.Property.GetMethod?.Invoke(null,null);
+			PropertyInfo property = info.Property;
+
+			MethodInfo setter = property.SetMethod;
+			object defaultVal = property.GetMethod?.Invoke(null,null);
 
 			DefaultSettings.Add(setter,defaultVal);
 
