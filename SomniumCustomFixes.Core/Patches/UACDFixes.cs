@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using MelonLoader;
-
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 

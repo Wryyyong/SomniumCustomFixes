@@ -9,9 +9,10 @@
     <Import_RootNamespace>SomniumCustomFixes.Core</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Patches\DisableMouseCursor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Patches\UACDFixes.cs" />
-    <Compile Include="..\SomniumCustomFixes.Core\Patches\URPAssetFixes.cs" />
-    <Compile Include="..\SomniumCustomFixes.Core\Patches\GeneralQualityFixes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Patches\URPAssetFixes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Patches\GeneralQualityFixes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SomniumMelon.cs" />
   </ItemGroup>
 </Project>
