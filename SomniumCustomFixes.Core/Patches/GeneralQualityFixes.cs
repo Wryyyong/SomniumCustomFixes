@@ -24,7 +24,7 @@ static class GeneralQualityFixes {
 		}
 	}
 
-	static readonly List<SettingInfo> SettingsIndex = [
+	static readonly SettingInfo[] SettingsIndex = [
 		new(
 			type: typeof(QualitySettings),
 			name: nameof(QualitySettings.anisotropicFiltering),

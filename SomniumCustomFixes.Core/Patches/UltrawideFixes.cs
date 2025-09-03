@@ -9,7 +9,7 @@ namespace SomniumCustomFixes;
 
 [HarmonyPatch]
 static class UltrawideFixes {
-	static readonly Dictionary<Type,List<string>> TargetsExtend = new() {
+	static readonly Dictionary<Type,string[]> TargetsExtend = new() {
 		{typeof(CinemaScope),[
 			nameof(CinemaScope.Show),
 		]},
@@ -105,7 +105,7 @@ static class UltrawideFixes {
 	[HarmonyPatch]
 	private static class FilterExtend {
 		static IEnumerable<MethodBase> TargetMethods() {
-			foreach (KeyValuePair<Type,List<string>> target in TargetsExtend) {
+			foreach (KeyValuePair<Type,string[]> target in TargetsExtend) {
 				Type type = target.Key;
 
 				foreach (string methodName in target.Value)
