@@ -1,0 +1,32 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <LangVersion>preview</LangVersion>
+    <Configurations>Release</Configurations>
+    <BaseOutputPath>..\bin</BaseOutputPath>
+    <IsPublishable>False</IsPublishable>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <Deterministic>False</Deterministic>
+    <WarningLevel>9999</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version_MelonLoader>0.7.1</Version_MelonLoader>
+    <Version_HarmonyX>2.10.2</Version_HarmonyX>
+    <Version_Il2CppInterop>1.5.0</Version_Il2CppInterop>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HarmonyX" Version="$(Version_HarmonyX)" />
+    <PackageReference Include="Il2CppInterop.Common" Version="$(Version_Il2CppInterop)" />
+    <PackageReference Include="Il2CppInterop.Generator" Version="$(Version_Il2CppInterop)" />
+    <PackageReference Include="Il2CppInterop.Runtime" Version="$(Version_Il2CppInterop)" />
+    <PackageReference Include="LavaGang.MelonLoader" Version="$(Version_MelonLoader)" />
+  </ItemGroup>
+
+  <Import Project="SomniumCustomFixes.Core\SomniumCustomFixes.Core.projitems" Label="Shared" />
+
+</Project>

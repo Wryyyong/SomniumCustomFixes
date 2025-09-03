@@ -1,29 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <PlatformTarget>x64</PlatformTarget>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <LangVersion>preview</LangVersion>
-    <Configurations>Release</Configurations>
-    <BaseOutputPath>..\bin</BaseOutputPath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <IsPublishable>False</IsPublishable>
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <Deterministic>False</Deterministic>
-    <WarningLevel>9999</WarningLevel>
     <DefineConstants>$(DefineConstants);AINI</DefineConstants>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="HarmonyX" Version="2.10.2" />
-    <PackageReference Include="Il2CppInterop.Common" Version="1.5.0" />
-    <PackageReference Include="Il2CppInterop.Generator" Version="1.5.0" />
-    <PackageReference Include="Il2CppInterop.Runtime" Version="1.5.0" />
-    <PackageReference Include="LavaGang.MelonLoader" Version="0.7.1" />
-  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
@@ -47,7 +26,5 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
-
-  <Import Project="..\SomniumCustomFixes.Core\SomniumCustomFixes.Core.projitems" Label="Shared" />
 
 </Project>
