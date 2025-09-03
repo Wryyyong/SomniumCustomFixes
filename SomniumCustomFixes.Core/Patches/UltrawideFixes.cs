@@ -3,6 +3,7 @@ using System.Reflection;
 
 using Il2CppGame;
 
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace SomniumCustomFixes;
@@ -44,7 +45,7 @@ static class UltrawideFixes {
 
 	static bool ShouldBotherWithFixes;
 
-	static readonly Vector3 UWBase = new(1f,1f,1f);
+	static readonly Dictionary<Scene,Dictionary<Component,Vector3>> Cache = [];
 	static Vector3 UWExtend = new(1f,1f,1f);
 	static Vector3 UWHorizontal = new(1f,1f,1f);
 
@@ -75,8 +76,16 @@ static class UltrawideFixes {
 		ResolutionChanged(0,0);
 	}
 
-	static readonly LemonAction<bool,bool> SetShouldBother = static (_,_) =>
-		ShouldBotherWithFixes = DoUltrawideFixes.Value && AspectRatioCustom > AspectRatioNative;
+	static readonly LemonAction<bool,bool> SetShouldBother = static (_,_) => {
+		bool newVal = DoUltrawideFixes.Value && AspectRatioCustom > AspectRatioNative;
+		ShouldBotherWithFixes = newVal;
+
+		if (newVal) return;
+
+		foreach (Dictionary<Component,Vector3> dict in Cache.Values)
+			foreach (KeyValuePair<Component,Vector3> set in dict)
+				set.Key.transform.localScale = set.Value;
+	};
 
 	static readonly LemonAction<int,int> ResolutionChanged = static (_,_) => {
 		AspectRatioCustom = (float)ResWidth.Value / ResHeight.Value;
@@ -102,6 +111,15 @@ static class UltrawideFixes {
 		__instance.m_ScreenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
 	}
 
+	static Vector3 CacheComponent(Component component) {
+		Dictionary<Component,Vector3> cacheScene = Cache[component.gameObject.scene];
+
+		if (!cacheScene.ContainsKey(component))
+			cacheScene.Add(component,component.transform.localScale);
+
+		return cacheScene[component];
+	}
+
 	[HarmonyPatch]
 	private static class FilterExtend {
 		static IEnumerable<MethodBase> TargetMethods() {
@@ -114,6 +132,8 @@ static class UltrawideFixes {
 		}
 
 		static void Postfix(Component __instance) {
+			CacheComponent(__instance);
+
 			if (!ShouldBotherWithFixes) return;
 
 			__instance.transform.localScale = UWExtend;
@@ -124,6 +144,9 @@ static class UltrawideFixes {
 	[HarmonyPatch(typeof(VideoController),nameof(VideoController.Stop))]
 	[HarmonyPostfix]
 	static void FixViewport(MethodBase __originalMethod,VideoController __instance) {
+		RawImage image = __instance.world.Image;
+		Vector3 cachedVector = CacheComponent(image);
+
 		if (!ShouldBotherWithFixes) return;
 
 		Vector3 targetVector;
@@ -134,13 +157,31 @@ static class UltrawideFixes {
 				break;
 
 			case nameof(VideoController.Stop):
-				targetVector = UWBase;
+				targetVector = cachedVector;
 				break;
 
 			default:
 				return;
 		}
 
-		__instance.world.Image.transform.localScale = targetVector;
+		image.transform.localScale = targetVector;
+	}
+
+	[HarmonyPatch(typeof(SceneManager),nameof(SceneManager.Internal_SceneLoaded))]
+	[HarmonyPatch(typeof(SceneManager),nameof(SceneManager.Internal_SceneUnloaded))]
+	[HarmonyPostfix]
+	static void Internal_SceneLoaded(MethodBase __originalMethod,Scene scene) {
+		switch (__originalMethod.Name) {
+			case nameof(SceneManager.Internal_SceneLoaded):
+				Cache.Add(scene,[]);
+				break;
+
+			case nameof(SceneManager.Internal_SceneUnloaded):
+				Cache.Remove(scene);
+				break;
+
+			default:
+				return;
+		}
 	}
 }
