@@ -1,10 +1,10 @@
-using UnityEngine.Rendering.Universal;
+using URP = UnityEngine.Rendering.Universal;
 
 namespace SomniumCustomFixes;
 
-[HarmonyPatch(typeof(UniversalRenderPipelineAsset),nameof(UniversalRenderPipelineAsset.CreatePipeline))]
+[HarmonyPatch(typeof(URP.UniversalRenderPipelineAsset),nameof(URP.UniversalRenderPipelineAsset.CreatePipeline))]
 static class URPAssetFixes {
-	const ShadowResolution TargetShadowRes = ShadowResolution.
+	const URP.ShadowResolution TargetShadowRes = URP.ShadowResolution.
 	#if AINI
 		_4096
 	#elif AINS
@@ -12,17 +12,17 @@ static class URPAssetFixes {
 	#endif
 	;
 
-	static void Postfix(UniversalRenderPipelineAsset __instance) {
+	static void Postfix(URP.UniversalRenderPipelineAsset __instance) {
 		__instance.m_AdditionalLightsShadowmapResolution = TargetShadowRes;
 		__instance.m_LocalShadowsAtlasResolution = TargetShadowRes;
 		__instance.m_MainLightShadowmapResolution = TargetShadowRes;
 		__instance.m_MaxPixelLights = 4;
 		__instance.m_ShadowAtlasResolution = TargetShadowRes;
-		__instance.m_ShadowType = ShadowQuality.SoftShadows;
-		__instance.shadowCascadeOption = ShadowCascadesOption.FourCascades;
+		__instance.m_ShadowType = URP.ShadowQuality.SoftShadows;
+		__instance.shadowCascadeOption = URP.ShadowCascadesOption.FourCascades;
 
-		#if AINS
-		__instance.softShadowQuality = SoftShadowQuality.High;
-		#endif
+	#if AINS
+		__instance.softShadowQuality = URP.SoftShadowQuality.High;
+	#endif
 	}
 }

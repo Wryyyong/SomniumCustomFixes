@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -29,7 +28,9 @@ static class UACDFixes {
 	};
 
 	internal static void Init() {
-		TargetMode = SomniumMelon.Settings.CreateEntry(
+		MelonPreferences_Category settings = SomniumMelon.Settings;
+
+		TargetMode = settings.CreateEntry(
 			"AntialiasingMode",
 			AntialiasingMode.SubpixelMorphologicalAntiAliasing,
 			"Antialiasing Mode",
@@ -45,7 +46,7 @@ static class UACDFixes {
 		#endif
 		);
 
-		TargetQuality = SomniumMelon.Settings.CreateEntry(
+		TargetQuality = settings.CreateEntry(
 			"AntialiasingQuality",
 			AntialiasingQuality.High,
 			"SMAA Quality",
@@ -78,11 +79,13 @@ static class UACDFixes {
 			uacd.antialiasingQuality = targetQuality;
 		}
 
+		/*
 		if (!uacd.renderPostProcessing) {
 			logMsg.Append($" Enabled renderPostProcessing;");
 
 			uacd.renderPostProcessing = true;
 		}
+		*/
 
 		if (string.IsNullOrWhiteSpace(logMsg.ToString())) return;
 
@@ -92,7 +95,7 @@ static class UACDFixes {
 		);
 	}
 
-	static readonly LemonAction<object,object> RefreshAllUACD = (_,_) => {
+	static readonly LemonAction<object,object> RefreshAllUACD = static (_,_) => {
 		foreach (List<UniversalAdditionalCameraData> uacdList in Cache.Values)
 			uacdList.ForEach(ModifyUACD);
 	};

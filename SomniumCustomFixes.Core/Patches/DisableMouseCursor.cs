@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace SomniumCustomFixes;
 
 [HarmonyPatch(typeof(Cursor),nameof(Cursor.visible),MethodType.Setter)]

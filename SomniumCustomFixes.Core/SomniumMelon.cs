@@ -1,6 +1,10 @@
+global using System.Collections.Generic;
+
 global using MelonLoader;
 
 global using HarmonyLib;
+
+global using UnityEngine;
 
 using SomniumCustomFixes;
 
@@ -22,9 +26,10 @@ class SomniumMelon : MelonMod {
 	#endif
 	;
 
+	static MelonLogger.Instance Logger;
+
 	internal static MelonPreferences_Category Settings = MelonPreferences.CreateCategory(ModTitle);
 
-	static MelonLogger.Instance Logger;
 	static readonly MelonPreferences_Entry<bool> LogVerbose = Settings.CreateEntry(
 		"LogVerbose",
 		false,
@@ -48,5 +53,6 @@ class SomniumMelon : MelonMod {
 		DisableMouseCursor.Init();
 		GeneralQualityFixes.Init();
 		UACDFixes.Init();
+		UltrawideFixes.Init();
 	}
 }

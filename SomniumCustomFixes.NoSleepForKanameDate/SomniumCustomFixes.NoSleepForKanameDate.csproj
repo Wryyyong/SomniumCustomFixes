@@ -42,6 +42,10 @@
       <HintPath>External\UnityEngine.CoreModule.stripped.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>External\UnityEngine.UI.stripped.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
 
   <Import Project="..\SomniumCustomFixes.Core\SomniumCustomFixes.Core.projitems" Label="Shared" />
