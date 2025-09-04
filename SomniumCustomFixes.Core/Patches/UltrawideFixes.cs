@@ -127,7 +127,7 @@ static class UltrawideFixes {
 				Type type = target.Key;
 
 				foreach (string methodName in target.Value)
-					yield return AccessTools.Method(type,methodName);
+					yield return type.GetMethod(methodName,AccessTools.all);
 			}
 		}
 

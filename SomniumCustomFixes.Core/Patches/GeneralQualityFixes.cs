@@ -5,22 +5,16 @@ namespace SomniumCustomFixes;
 
 [HarmonyPatch]
 static class GeneralQualityFixes {
-	private class SettingInfo {
-		readonly Type _type;
-		readonly string _name;
-		readonly PropertyInfo _property;
-		readonly object _targetValue;
-
-		internal Type Type { get => _type; }
-		internal string Name { get => _name; }
-		internal PropertyInfo Property { get => _property; }
-		internal object TargetValue { get => _targetValue; }
+	readonly struct SettingInfo {
+		internal PropertyInfo Property { get; init; }
+		internal object TargetValue { get; init; }
 
 		internal SettingInfo(Type type,string name,object trgt) {
-			_type = type;
-			_name = name;
-			_property = AccessTools.Property(type,name);
-			_targetValue = trgt;
+			PropertyInfo property = type?.GetProperty(name,AccessTools.all);
+			if (property is null) return;
+
+			Property = property;
+			TargetValue = trgt;
 		}
 	}
 
