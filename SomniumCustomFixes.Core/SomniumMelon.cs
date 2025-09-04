@@ -6,6 +6,8 @@ global using HarmonyLib;
 
 global using UnityEngine;
 
+using System.Linq;
+
 using SomniumCustomFixes;
 
 [assembly: MelonInfo(typeof(SomniumMelon),SomniumMelon.ModTitle,"1.0.0","Wryyyong")]
@@ -50,9 +52,8 @@ class SomniumMelon : MelonMod {
 	public override void OnInitializeMelon() {
 		Logger = LoggerInstance;
 
-		DisableMouseCursor.Init();
-		GeneralQualityFixes.Init();
-		UACDFixes.Init();
-		UltrawideFixes.Init();
+		GetType().Assembly.GetTypes()
+			.Select(type => type.GetMethod("Init",AccessTools.all))
+			.ToList().ForEach(method => method?.Invoke(null,null));
 	}
 }

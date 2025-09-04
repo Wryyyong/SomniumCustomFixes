@@ -49,7 +49,7 @@ static class UltrawideFixes {
 	static Vector3 UWExtend = new(1f,1f,1f);
 	static Vector3 UWHorizontal = new(1f,1f,1f);
 
-	internal static void Init() {
+	static void Init() {
 		MelonPreferences_Category settings = SomniumMelon.Settings;
 		Display displayMain = Display.main;
 

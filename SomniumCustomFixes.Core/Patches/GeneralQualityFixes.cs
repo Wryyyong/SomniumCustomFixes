@@ -87,7 +87,7 @@ static class GeneralQualityFixes {
 	static readonly Dictionary<MethodInfo,object> DefaultSettings = [];
 	static readonly Dictionary<MethodInfo,object> TargetSettings = [];
 
-	internal static void Init() {
+	static void Init() {
 		object[] paramList = [null];
 
 		foreach (SettingInfo info in SettingsIndex) {

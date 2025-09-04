@@ -27,7 +27,7 @@ static class UACDFixes {
 		{AntialiasingQuality.High,"High"},
 	};
 
-	internal static void Init() {
+	static void Init() {
 		MelonPreferences_Category settings = SomniumMelon.Settings;
 
 		TargetMode = settings.CreateEntry(
