@@ -59,15 +59,20 @@ static class UACDFixes {
 		+	$"\n- \"{AntialiasingQuality.High}\""
 		);
 
+		static void RefreshAllUACD(object oldVal = null,object newVal = null) {
+			foreach (var uacdList in Cache.Values)
+				uacdList.ForEach(ModifyUACD);
+		}
+
 		TargetMode.OnEntryValueChangedUntyped.Subscribe(RefreshAllUACD);
 		TargetQuality.OnEntryValueChangedUntyped.Subscribe(RefreshAllUACD);
 	}
 
 	static void ModifyUACD(UniversalAdditionalCameraData uacd) {
-		AntialiasingMode targetMode = TargetMode.Value;
-		AntialiasingQuality targetQuality = TargetQuality.Value;
+		var targetMode = TargetMode.Value;
+		var targetQuality = TargetQuality.Value;
 
-		StringBuilder logMsg = new();
+		var logMsg = new StringBuilder();
 
 		if (!(
 			uacd.antialiasing == targetMode
@@ -95,15 +100,10 @@ static class UACDFixes {
 		);
 	}
 
-	static readonly LemonAction<object,object> RefreshAllUACD = static (_,_) => {
-		foreach (List<UniversalAdditionalCameraData> uacdList in Cache.Values)
-			uacdList.ForEach(ModifyUACD);
-	};
-
 	[HarmonyPatch(nameof(SceneManager.Internal_SceneLoaded))]
 	[HarmonyPostfix]
 	static void Internal_SceneLoaded(Scene scene) {
-		List<UniversalAdditionalCameraData> newList = [];
+		var newList = new List<UniversalAdditionalCameraData>();
 
 		scene
 			.GetRootGameObjects().ToList()

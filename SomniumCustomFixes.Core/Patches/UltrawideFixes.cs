@@ -50,8 +50,8 @@ static class UltrawideFixes {
 	static Vector3 UWHorizontal = new(1f,1f,1f);
 
 	static void Init() {
-		MelonPreferences_Category settings = SomniumMelon.Settings;
-		Display displayMain = Display.main;
+		var settings = SomniumMelon.Settings;
+		var displayMain = Display.main;
 
 		ResWidth = settings.CreateEntry(
 			"CustomResolutionWidth",
@@ -69,34 +69,36 @@ static class UltrawideFixes {
 			"Fix ultrawide UI issues"
 		);
 
+		static void SetShouldBother(bool oldVal = false,bool newVal = false) {
+			ShouldBotherWithFixes =
+				DoUltrawideFixes.Value
+			&&	AspectRatioCustom > AspectRatioNative
+			;
+
+			if (ShouldBotherWithFixes) return;
+
+			foreach (var dict in Cache.Values)
+				foreach (var set in dict)
+					set.Key.transform.localScale = set.Value;
+		}
+
+		static void ResolutionChanged(int oldVal = 0,int newVal = 0) {
+			AspectRatioCustom = (float)ResWidth.Value / ResHeight.Value;
+			AspectRatioMultiplier = AspectRatioCustom / AspectRatioNative;
+
+			UWExtend.x = 1f * AspectRatioMultiplier;
+			UWHorizontal.x = 1f / AspectRatioMultiplier;
+
+			SetCustomResolution();
+			SetShouldBother();
+		}
+
 		ResWidth.OnEntryValueChanged.Subscribe(ResolutionChanged);
 		ResHeight.OnEntryValueChanged.Subscribe(ResolutionChanged);
 		DoUltrawideFixes.OnEntryValueChanged.Subscribe(SetShouldBother);
 
-		ResolutionChanged(0,0);
+		ResolutionChanged();
 	}
-
-	static readonly LemonAction<bool,bool> SetShouldBother = static (_,_) => {
-		bool newVal = DoUltrawideFixes.Value && AspectRatioCustom > AspectRatioNative;
-		ShouldBotherWithFixes = newVal;
-
-		if (newVal) return;
-
-		foreach (Dictionary<Component,Vector3> dict in Cache.Values)
-			foreach (KeyValuePair<Component,Vector3> set in dict)
-				set.Key.transform.localScale = set.Value;
-	};
-
-	static readonly LemonAction<int,int> ResolutionChanged = static (_,_) => {
-		AspectRatioCustom = (float)ResWidth.Value / ResHeight.Value;
-		AspectRatioMultiplier = AspectRatioCustom / AspectRatioNative;
-
-		UWExtend.x = 1f * AspectRatioMultiplier;
-		UWHorizontal.x = 1f / AspectRatioMultiplier;
-
-		SetCustomResolution();
-		SetShouldBother(false,false);
-	};
 
 	[HarmonyPatch(typeof(LauncherArgs),nameof(LauncherArgs.OnRuntimeMethodLoad))]
 	[HarmonyPostfix]
@@ -112,7 +114,7 @@ static class UltrawideFixes {
 	}
 
 	static Vector3 CacheComponent(Component component) {
-		Dictionary<Component,Vector3> cacheScene = Cache[component.gameObject.scene];
+		var cacheScene = Cache[component.gameObject.scene];
 
 		if (!cacheScene.ContainsKey(component))
 			cacheScene.Add(component,component.transform.localScale);
@@ -123,10 +125,10 @@ static class UltrawideFixes {
 	[HarmonyPatch]
 	private static class FilterExtend {
 		static IEnumerable<MethodBase> TargetMethods() {
-			foreach (KeyValuePair<Type,string[]> target in TargetsExtend) {
-				Type type = target.Key;
+			foreach (var target in TargetsExtend) {
+				var type = target.Key;
 
-				foreach (string methodName in target.Value)
+				foreach (var methodName in target.Value)
 					yield return type.GetMethod(methodName,AccessTools.all);
 			}
 		}
@@ -144,8 +146,8 @@ static class UltrawideFixes {
 	[HarmonyPatch(typeof(VideoController),nameof(VideoController.Stop))]
 	[HarmonyPostfix]
 	static void FixViewport(MethodBase __originalMethod,VideoController __instance) {
-		RawImage image = __instance.world.Image;
-		Vector3 cachedVector = CacheComponent(image);
+		var image = __instance.world.Image;
+		var cachedVector = CacheComponent(image);
 
 		if (!ShouldBotherWithFixes) return;
 

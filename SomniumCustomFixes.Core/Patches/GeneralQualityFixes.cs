@@ -10,7 +10,7 @@ static class GeneralQualityFixes {
 		internal object TargetValue { get; init; }
 
 		internal SettingInfo(Type type,string name,object trgt) {
-			PropertyInfo property = type?.GetProperty(name,AccessTools.all);
+			var property = type?.GetProperty(name,AccessTools.all);
 			if (property is null) return;
 
 			Property = property;
@@ -82,13 +82,13 @@ static class GeneralQualityFixes {
 	static readonly Dictionary<MethodInfo,object> TargetSettings = [];
 
 	static void Init() {
-		object[] paramList = [null];
+		var paramList = new object[1];
 
-		foreach (SettingInfo info in SettingsIndex) {
-			PropertyInfo property = info.Property;
+		foreach (var info in SettingsIndex) {
+			var property = info.Property;
 
-			MethodInfo setter = property.SetMethod;
-			object defaultVal = property.GetMethod?.Invoke(null,null);
+			var setter = property.SetMethod;
+			var defaultVal = property.GetMethod?.Invoke(null,null);
 
 			DefaultSettings.Add(setter,defaultVal);
 
@@ -98,8 +98,8 @@ static class GeneralQualityFixes {
 	}
 
 	static IEnumerable<MethodBase> TargetMethods() {
-		foreach (SettingInfo info in SettingsIndex) {
-			MethodInfo setter = info.Property.SetMethod;
+		foreach (var info in SettingsIndex) {
+			var setter = info.Property.SetMethod;
 
 			TargetSettings.Add(setter,info.TargetValue);
 
@@ -108,7 +108,7 @@ static class GeneralQualityFixes {
 	}
 
 	static void Prefix(MethodInfo __originalMethod,ref object __0) {
-		TargetSettings.TryGetValue(__originalMethod,out object newVal);
+		TargetSettings.TryGetValue(__originalMethod,out var newVal);
 
 		if (
 			newVal is null

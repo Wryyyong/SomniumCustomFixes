@@ -42,7 +42,7 @@ class SomniumMelon : MelonMod {
 	internal static void EasyLog(params string[] logMsgs) {
 		if (!LogVerbose.Value) return;
 
-		foreach (string msg in logMsgs) {
+		foreach (var msg in logMsgs) {
 			if (string.IsNullOrWhiteSpace(msg)) continue;
 
 			Logger.Msg(msg);
