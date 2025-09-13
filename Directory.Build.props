@@ -11,6 +11,7 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <Deterministic>False</Deterministic>
     <WarningLevel>9999</WarningLevel>
+    <AnalysisLevel>preview-recommended</AnalysisLevel>
   </PropertyGroup>
 
   <PropertyGroup>
