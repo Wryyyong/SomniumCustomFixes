@@ -28,6 +28,29 @@
     <PackageReference Include="LavaGang.MelonLoader" Version="$(Version_MelonLoader)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>External\Assembly-CSharp.stripped.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>External\Il2Cppmscorlib.stripped.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+      <HintPath>External\Unity.RenderPipelines.Universal.Runtime.stripped.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>External\UnityEngine.CoreModule.stripped.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>External\UnityEngine.UI.stripped.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
   <Import Project="SomniumCustomFixes.Core\SomniumCustomFixes.Core.projitems" Label="Shared" />
 
 </Project>
