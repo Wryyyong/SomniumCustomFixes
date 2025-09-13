@@ -116,17 +116,36 @@ static class UltrawideFixes {
 		__instance.m_ScreenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
 	}
 
+	static Dictionary<Component,Vector3> GetCacheScene(Scene scene) {
+		if (!Cache.TryGetValue(scene,out var cacheScene)) {
+			cacheScene = [];
+			Cache.TryAdd(scene,cacheScene);
+		}
+
+		return cacheScene;
+	}
+
 	static Vector3 CacheComponent(Component component) {
-		var cacheScene = Cache[component.gameObject.scene];
+		var cacheScene = GetCacheScene(component.gameObject.scene);
 
-		if (!cacheScene.ContainsKey(component))
-			cacheScene.Add(component,component.transform.localScale);
+		if (!cacheScene.TryGetValue(component,out var vector)) {
+			vector = component.transform.localScale;
+			cacheScene.TryAdd(component,vector);
+		}
 
-		return cacheScene[component];
+		return vector;
 	}
 
 	[HarmonyPatch]
 	private static class FilterExtend {
+		static bool Prepare() {
+			foreach (var target in TargetsExtend.Values)
+				if (target.Length > 0)
+					return true;
+
+			return false;
+		}
+
 		static IEnumerable<MethodBase> TargetMethods() {
 			foreach (var target in TargetsExtend) {
 				var type = target.Key;
@@ -175,10 +194,10 @@ static class UltrawideFixes {
 	[HarmonyPatch(typeof(SceneManager),nameof(SceneManager.Internal_SceneLoaded))]
 	[HarmonyPatch(typeof(SceneManager),nameof(SceneManager.Internal_SceneUnloaded))]
 	[HarmonyPostfix]
-	static void Internal_SceneLoaded(MethodBase __originalMethod,Scene scene) {
+	static void SceneUpdate(MethodBase __originalMethod,Scene scene) {
 		switch (__originalMethod.Name) {
 			case nameof(SceneManager.Internal_SceneLoaded):
-				Cache.Add(scene,[]);
+				GetCacheScene(scene);
 				break;
 
 			case nameof(SceneManager.Internal_SceneUnloaded):
