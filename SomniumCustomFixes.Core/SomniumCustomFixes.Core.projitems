@@ -10,10 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Patches\DisableMouseCursor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Patches\UACDFixes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Patches\QualityFixes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Patches\UltrawideFixes.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Patches\URPAssetFixes.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Patches\GeneralQualityFixes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SomniumMelon.cs" />
   </ItemGroup>
 </Project>

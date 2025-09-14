@@ -23,7 +23,6 @@
   <ItemGroup>
     <PackageReference Include="HarmonyX" Version="$(Version_HarmonyX)" />
     <PackageReference Include="Il2CppInterop.Common" Version="$(Version_Il2CppInterop)" />
-    <PackageReference Include="Il2CppInterop.Generator" Version="$(Version_Il2CppInterop)" />
     <PackageReference Include="Il2CppInterop.Runtime" Version="$(Version_Il2CppInterop)" />
     <PackageReference Include="LavaGang.MelonLoader" Version="$(Version_MelonLoader)" />
   </ItemGroup>

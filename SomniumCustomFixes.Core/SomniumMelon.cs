@@ -1,5 +1,3 @@
-global using System.Collections.Generic;
-
 global using MelonLoader;
 
 global using HarmonyLib;
@@ -28,6 +26,7 @@ class SomniumMelon : MelonMod {
 	#endif
 	;
 
+	internal static HarmonyLib.Harmony HarmonyInst;
 	static MelonLogger.Instance Logger;
 
 	internal static MelonPreferences_Category PrefDebug;
@@ -53,6 +52,7 @@ class SomniumMelon : MelonMod {
 	}
 
 	public override void OnInitializeMelon() {
+		HarmonyInst = HarmonyInstance;
 		Logger = LoggerInstance;
 
 		PrefDebug = PrefCategoryInit("Debugging");

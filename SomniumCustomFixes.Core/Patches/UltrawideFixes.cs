@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
-
-using Il2CppGame;
 
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
+using Il2CppGame;
 
 namespace SomniumCustomFixes;
 
@@ -16,7 +17,7 @@ static class UltrawideFixes {
 		]},
 		{typeof(FilterController),[
 			nameof(FilterController.Black),
-			/* Il2CppInterop currently doesn't like nullable parameters for some reason
+			/*// Il2CppInterop currently doesn't like nullable parameters for some reason
 			nameof(FilterController.FadeIn),
 			nameof(FilterController.FadeInWait),
 			nameof(FilterController.FadeOut),
@@ -137,7 +138,7 @@ static class UltrawideFixes {
 	}
 
 	[HarmonyPatch]
-	private static class FilterExtend {
+	static class FilterExtend {
 		static bool Prepare() {
 			foreach (var target in TargetsExtend.Values)
 				if (target.Length > 0)
