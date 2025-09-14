@@ -9,13 +9,41 @@ namespace SomniumCustomFixes.Patches;
 static class QualityFixes {
 	static MelonPreferences_Category QualityPrefs;
 
+	static MelonPreferences_Entry<URP.ShadowResolution> URPShadowResolution;
 	static MelonPreferences_Entry<URP.AntialiasingMode> AntialiasingMode;
 	static MelonPreferences_Entry<URP.AntialiasingQuality> AntialiasingQuality;
 
 	static void Init() {
+		const int DefaultPixelLights = 4;
+		const URP.ShadowCascadesOption ShadowCascades = URP.ShadowCascadesOption.FourCascades;
+		const URP.ShadowResolution MaxURPShadowRes = URP.ShadowResolution.
+		#if AINI
+			_4096
+		#elif AINS
+			_8192
+		#endif
+		;
+
 		#region Preferences Setup
 
 		QualityPrefs = SomniumMelon.PrefCategoryInit("QualitySettings");
+
+		URPShadowResolution = QualityPrefs.CreateEntry(
+			"URP_ShadowResolution",
+			MaxURPShadowRes,
+			"Shadow Resolution",
+			$"The resolution to render shadows at"
+		+	$"\nPossible values:"
+		+	$"\n- \"{URP.ShadowResolution._256}\""
+		+	$"\n- \"{URP.ShadowResolution._512}\""
+		+	$"\n- \"{URP.ShadowResolution._1024}\""
+		+	$"\n- \"{URP.ShadowResolution._2048}\""
+		+	$"\n- \"{URP.ShadowResolution._4096}\""
+
+		#if AINS
+		+	$"\n- \"{URP.ShadowResolution._8192}\""
+		#endif
+		);
 
 		AntialiasingMode = QualityPrefs.CreateEntry(
 			"AntialiasingMode",
@@ -61,8 +89,13 @@ static class QualityFixes {
 			data.Refresh();
 		}
 
+		static void RefreshURPAsset(object oldVal = null,object newVal = null) =>
+			RefreshSettings<URP.UniversalRenderPipelineAsset>();
+
 		static void RefreshUACD(object oldVal = null,object newVal = null) =>
 			RefreshSettings<URP.UniversalAdditionalCameraData>();
+
+		URPShadowResolution.OnEntryValueChangedUntyped.Subscribe(RefreshURPAsset);
 
 		AntialiasingMode.OnEntryValueChangedUntyped.Subscribe(RefreshUACD);
 		AntialiasingQuality.OnEntryValueChangedUntyped.Subscribe(RefreshUACD);
@@ -70,16 +103,13 @@ static class QualityFixes {
 		#endregion
 		#region SettingInfo Setup
 
-		const int DefaultPixelLights = 4;
-		const URP.ShadowResolution DefaultShadowRes = URP.ShadowResolution.
-		#if AINI
-			_4096
-		#elif AINS
-			_8192
-		#endif
-		;
+		var harmony = SomniumMelon.HarmonyInst;
+		var paramList = new object[1];
+		ref var defaultVal = ref paramList[0];
 
-		SettingInfo[] index = [
+		var staticPatch = new HarmonyMethod(typeof(QualityFixes).GetMethod(nameof(StaticPatch),AccessTools.all));
+
+		Array.ForEach<SettingInfo>([
 			new SettingInfo<QualitySettings>(
 				nameof(QualitySettings.anisotropicFiltering),
 				AnisotropicFiltering.ForceEnable
@@ -92,18 +122,22 @@ static class QualityFixes {
 				nameof(QualitySettings.lodBias),
 				100f
 			),
+			/*
 			new SettingInfo<QualitySettings>(
 				nameof(QualitySettings.particleRaycastBudget),
 				4096
 			),
+			*/
 			new SettingInfo<QualitySettings>(
 				nameof(QualitySettings.pixelLightCount),
 				DefaultPixelLights
 			),
+			/*
 			new SettingInfo<QualitySettings>(
 				nameof(QualitySettings.shadows),
 				ShadowQuality.All
 			),
+			*/
 			new SettingInfo<QualitySettings>(
 				nameof(QualitySettings.shadowCascades),
 				4
@@ -129,15 +163,15 @@ static class QualityFixes {
 
 			new SettingInfo<URP.UniversalRenderPipelineAsset>(
 				nameof(URP.UniversalRenderPipelineAsset.m_AdditionalLightsShadowmapResolution),
-				DefaultShadowRes
+				URPShadowResolution
 			),
 			new SettingInfo<URP.UniversalRenderPipelineAsset>(
 				nameof(URP.UniversalRenderPipelineAsset.m_LocalShadowsAtlasResolution),
-				DefaultShadowRes
+				URPShadowResolution
 			),
 			new SettingInfo<URP.UniversalRenderPipelineAsset>(
 				nameof(URP.UniversalRenderPipelineAsset.m_MainLightShadowmapResolution),
-				DefaultShadowRes
+				URPShadowResolution
 			),
 			new SettingInfo<URP.UniversalRenderPipelineAsset>(
 				nameof(URP.UniversalRenderPipelineAsset.m_MaxPixelLights),
@@ -145,7 +179,11 @@ static class QualityFixes {
 			),
 			new SettingInfo<URP.UniversalRenderPipelineAsset>(
 				nameof(URP.UniversalRenderPipelineAsset.m_ShadowAtlasResolution),
-				DefaultShadowRes
+				URPShadowResolution
+			),
+			new SettingInfo<URP.UniversalRenderPipelineAsset>(
+				nameof(URP.UniversalRenderPipelineAsset.m_ShadowCascades),
+				ShadowCascades
 			),
 			new SettingInfo<URP.UniversalRenderPipelineAsset>(
 				nameof(URP.UniversalRenderPipelineAsset.m_ShadowType),
@@ -153,7 +191,7 @@ static class QualityFixes {
 			),
 			new SettingInfo<URP.UniversalRenderPipelineAsset>(
 				nameof(URP.UniversalRenderPipelineAsset.shadowCascadeOption),
-				URP.ShadowCascadesOption.FourCascades
+				ShadowCascades
 			),
 
 			new SettingInfo<URP.UniversalAdditionalCameraData>(
@@ -171,15 +209,7 @@ static class QualityFixes {
 				URP.SoftShadowQuality.High
 			),
 		#endif
-		];
-
-		var harmony = SomniumMelon.HarmonyInst;
-		var paramList = new object[1];
-		ref var defaultVal = ref paramList[0];
-
-		var staticPatch = new HarmonyMethod(typeof(QualityFixes).GetMethod(nameof(StaticPatch),AccessTools.all));
-
-		foreach (var info in index) {
+		],info => {
 			var pref = info.PrefEntry;
 			var property = info.Property;
 			var getter = property.GetMethod;
@@ -193,7 +223,7 @@ static class QualityFixes {
 
 			data.TargetSettings.TryAdd(setter,info.TargetValue);
 
-			if (pref is null) continue;
+			if (pref is null) return;
 
 			var bindings = data.PreferenceBindings;
 
@@ -203,7 +233,7 @@ static class QualityFixes {
 			}
 
 			prefSetters.Add(setter);
-		}
+		});
 
 		#endregion
 	}
