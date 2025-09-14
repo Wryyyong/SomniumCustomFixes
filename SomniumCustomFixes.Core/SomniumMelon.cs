@@ -30,14 +30,17 @@ class SomniumMelon : MelonMod {
 
 	static MelonLogger.Instance Logger;
 
-	internal static MelonPreferences_Category Settings = MelonPreferences.CreateCategory(ModTitle);
+	internal static MelonPreferences_Category PrefDebug;
+	internal static MelonPreferences_Category PrefMisc;
 
-	static readonly MelonPreferences_Entry<bool> LogVerbose = Settings.CreateEntry(
-		"LogVerbose",
-		false,
-		"Enable debug mode",
-		"Set to true to enable verbose logging"
-	);
+	static MelonPreferences_Entry<bool> LogVerbose;
+
+	internal static MelonPreferences_Category PrefCategoryInit(string categoryName) {
+		var category = MelonPreferences.CreateCategory(categoryName);
+		category.SetFilePath($"UserData/{ModTitle}.ini");
+
+		return category;
+	}
 
 	internal static void EasyLog(params string[] logMsgs) {
 		if (!LogVerbose.Value) return;
@@ -51,6 +54,15 @@ class SomniumMelon : MelonMod {
 
 	public override void OnInitializeMelon() {
 		Logger = LoggerInstance;
+
+		PrefDebug = PrefCategoryInit("Debugging");
+		PrefMisc = PrefCategoryInit("Miscellaneous");
+
+		LogVerbose = PrefDebug.CreateEntry(
+			"LogVerbose",
+			false,
+			"Verbose logging"
+		);
 
 		GetType().Assembly.GetTypes()
 			.Select(type => type.GetMethod("Init",AccessTools.all))

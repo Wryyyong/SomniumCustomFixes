@@ -34,6 +34,8 @@ static class UltrawideFixes {
 		]},
 	};
 
+	static MelonPreferences_Category UltrawidePrefs;
+
 	static MelonPreferences_Entry<bool> DoUltrawideFixes;
 	static MelonPreferences_Entry<int> ResWidth;
 	static MelonPreferences_Entry<int> ResHeight;
@@ -50,23 +52,24 @@ static class UltrawideFixes {
 	static Vector3 UWHorizontal = new(1f,1f,1f);
 
 	static void Init() {
-		var settings = SomniumMelon.Settings;
 		var displayMain = Display.main;
 
-		ResWidth = settings.CreateEntry(
+		UltrawidePrefs = SomniumMelon.PrefCategoryInit("UltrawideFixes");
+
+		DoUltrawideFixes = UltrawidePrefs.CreateEntry(
+			"DoUltrawideFixes",
+			true,
+			"Fix ultrawide UI issues"
+		);
+		ResWidth = UltrawidePrefs.CreateEntry(
 			"CustomResolutionWidth",
 			displayMain.systemWidth,
 			"Custom resolution (width)"
 		);
-		ResHeight = settings.CreateEntry(
+		ResHeight = UltrawidePrefs.CreateEntry(
 			"CustomResolutionHeight",
 			displayMain.systemHeight,
 			"Custom resolution (height)"
-		);
-		DoUltrawideFixes = settings.CreateEntry(
-			"DoUltrawideFixes",
-			true,
-			"Fix ultrawide UI issues"
 		);
 
 		static void SetShouldBother(bool oldVal = false,bool newVal = false) {
@@ -93,9 +96,9 @@ static class UltrawideFixes {
 			SetShouldBother();
 		}
 
+		DoUltrawideFixes.OnEntryValueChanged.Subscribe(SetShouldBother);
 		ResWidth.OnEntryValueChanged.Subscribe(ResolutionChanged);
 		ResHeight.OnEntryValueChanged.Subscribe(ResolutionChanged);
-		DoUltrawideFixes.OnEntryValueChanged.Subscribe(SetShouldBother);
 
 		ResolutionChanged();
 	}

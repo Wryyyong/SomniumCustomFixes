@@ -5,7 +5,7 @@ static class DisableMouseCursor {
 	static MelonPreferences_Entry<bool> RunPatch;
 
 	static void Init() {
-		RunPatch = SomniumMelon.Settings.CreateEntry(
+		RunPatch = SomniumMelon.PrefMisc.CreateEntry(
 			"DisableMouseCursor",
 			false,
 			"Disable mouse cursor"
