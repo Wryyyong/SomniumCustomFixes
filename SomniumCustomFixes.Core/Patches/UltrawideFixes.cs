@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 using Il2CppGame;
 
-namespace SomniumCustomFixes;
+namespace SomniumCustomFixes.Patches;
 
 [HarmonyPatch]
 static class UltrawideFixes {

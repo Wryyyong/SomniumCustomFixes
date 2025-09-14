@@ -1,4 +1,4 @@
-namespace SomniumCustomFixes;
+namespace SomniumCustomFixes.Patches;
 
 [HarmonyPatch(typeof(Cursor),nameof(Cursor.visible),MethodType.Setter)]
 static class DisableMouseCursor {

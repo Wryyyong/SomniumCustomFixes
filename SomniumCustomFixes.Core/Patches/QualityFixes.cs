@@ -1,144 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-
-using uObject = UnityEngine.Object;
 using URP = UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
-namespace SomniumCustomFixes;
+using SomniumCustomFixes.Helpers;
+
+namespace SomniumCustomFixes.Patches;
 
 [HarmonyPatch]
 static class QualityFixes {
-	class SettingInfo {
-		internal Type Type { get; init; }
-		internal PropertyInfo Property { get; init; }
-		internal MelonPreferences_Entry PrefEntry { get; init; }
-
-		internal object TargetValue { get; init; }
-
-		internal bool DoPatchStatic { get; init; }
-	}
-
-	class SettingInfo<T> : SettingInfo where T : uObject {
-		internal SettingInfo(string name,object trgt) {
-			var type = typeof(T);
-			var property = type.GetProperty(name,AccessTools.all);
-
-			if (property is null) return;
-
-			Type = type;
-			Property = property;
-
-			TargetValue = trgt;
-
-			var hasSetter = property.SetMethod is not null;
-
-			DoPatchStatic =
-				hasSetter
-			&&	AccessTools.IsStatic(property)
-			&&	Type.GetField($"NativeFieldInfoPtr_{name}",AccessTools.all) is null
-			;
-
-			if (!hasSetter) return;
-
-			// Do not ignore method results
-		#pragma warning disable CA1806
-			new TypeData<T>();
-		#pragma warning restore CA1806
-		}
-
-		internal SettingInfo(string name,MelonPreferences_Entry entry) : this(name,entry.BoxedValue) =>
-			PrefEntry = entry;
-	}
-
-	class TypeData {
-		internal static readonly Dictionary<Type,TypeData> RegisteredTypes = [];
-
-		internal Func<Il2CppArrayBase> GetAllObjects { get; init; }
-		internal Dictionary<MethodBase,MethodBase> Properties { get; init; } = [];
-		internal Dictionary<MelonPreferences_Entry,HashSet<MethodBase>> PreferenceBindings { get; init; } = [];
-		internal Dictionary<object,Dictionary<MethodBase,object>> Cache { get; init; } = [];
-
-		internal void CleanCache() {
-			foreach (var obj in Cache.Keys) {
-				if (
-					!(
-						obj is null
-					||	(
-							obj is uObject uObj
-						&&	!uObj
-					)
-				)) continue;
-
-				Cache.Remove(obj);
-			}
-		}
-
-		internal void UpdateCache() {
-			foreach (var obj in GetAllObjects()) {
-				if (Cache.ContainsKey(obj)) continue;
-
-				var oldValList = new Dictionary<MethodBase,object>();
-				Cache.TryAdd(obj,oldValList);
-			}
-		}
-
-		internal void Refresh() {
-			var paramList = new object[1];
-			ref var newVal = ref paramList[0];
-
-			var logMsgs = new List<string>();
-
-			foreach (var set in Cache) {
-				var obj = set.Key;
-				var oldValList = set.Value;
-
-				foreach (var property in Properties) {
-					var setter = property.Key;
-					var oldVal = property.Value?.Invoke(obj,null);
-
-					oldValList.TryAdd(setter,oldVal);
-
-					if (
-						!TargetSettings.TryGetValue(setter,out newVal)
-					||	newVal.Equals(oldVal)
-					) continue;
-
-					logMsgs?.Add($"{(obj as uObject).name} :: {setter.Name} | {oldVal} -> {newVal}");
-					setter.Invoke(obj,paramList);
-				}
-			}
-
-			SomniumMelon.EasyLog([.. logMsgs]);
-		}
-
-		internal void FullUpdate() {
-			CleanCache();
-			UpdateCache();
-			Refresh();
-		}
-	}
-
-	class TypeData<T> : TypeData where T : uObject {
-		internal TypeData() {
-			var type = typeof(T);
-			if (RegisteredTypes.ContainsKey(type)) return;
-
-			GetAllObjects = Resources.FindObjectsOfTypeAll<T>;
-
-			RegisteredTypes.TryAdd(type,this);
-		}
-	}
-
 	static MelonPreferences_Category QualityPrefs;
 
 	static MelonPreferences_Entry<URP.AntialiasingMode> AntialiasingMode;
 	static MelonPreferences_Entry<URP.AntialiasingQuality> AntialiasingQuality;
-
-	static readonly Dictionary<MethodBase,object> TargetSettings = [];
 
 	static void Init() {
 		#region Preferences Setup
@@ -177,11 +49,13 @@ static class QualityFixes {
 		static void RefreshSettings<T>() {
 			if (!TypeData.RegisteredTypes.TryGetValue(typeof(T),out var data)) return;
 
+			var settings = data.TargetSettings;
+
 			foreach (var binding in data.PreferenceBindings) {
 				var newVal = binding.Key.BoxedValue;
 
 				foreach (var setter in binding.Value)
-					TargetSettings[setter] = newVal;
+					settings[setter] = newVal;
 			}
 
 			data.Refresh();
@@ -317,7 +191,7 @@ static class QualityFixes {
 			TypeData.RegisteredTypes.TryGetValue(info.Type,out var data);
 			data.Properties.TryAdd(setter,getter);
 
-			TargetSettings.TryAdd(setter,info.TargetValue);
+			data.TargetSettings.TryAdd(setter,info.TargetValue);
 
 			if (pref is null) continue;
 
@@ -359,7 +233,10 @@ static class QualityFixes {
 
 	static void StaticPatch(MethodBase __originalMethod,ref object __0) {
 		if (
-			!TargetSettings.TryGetValue(__originalMethod,out var newVal)
+			!(
+				TypeData.RegisteredTypes.TryGetValue(__originalMethod.DeclaringType,out var data)
+			&&	data.TargetSettings.TryGetValue(__originalMethod,out var newVal)
+		)
 		||	newVal.Equals(__0)
 		) return;
 

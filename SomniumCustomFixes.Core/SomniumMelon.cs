@@ -1,8 +1,13 @@
+global using System;
+global using System.Collections.Generic;
+global using System.Reflection;
+
 global using MelonLoader;
 
 global using HarmonyLib;
 
 global using UnityEngine;
+global using uObject = UnityEngine.Object;
 
 using System.Linq;
 
