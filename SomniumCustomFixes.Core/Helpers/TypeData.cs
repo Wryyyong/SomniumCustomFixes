@@ -49,12 +49,12 @@ class TypeData {
 				var setter = property.Key;
 				var oldVal = property.Value?.Invoke(obj,null);
 
-				oldValList.TryAdd(setter,oldVal);
-
 				if (
 					!TargetSettings.TryGetValue(setter,out newVal)
 				||	newVal.Equals(oldVal)
 				) continue;
+
+				oldValList.TryAdd(setter,oldVal);
 
 				logMsgs?.Add($"{(obj as uObject).name} :: {setter.Name} | {oldVal} -> {newVal}");
 				setter.Invoke(obj,paramList);

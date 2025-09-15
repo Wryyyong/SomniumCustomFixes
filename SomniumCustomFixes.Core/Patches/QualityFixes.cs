@@ -24,6 +24,14 @@ static class QualityFixes {
 		#endif
 		;
 
+		const URP.AntialiasingMode AntialiasingModeDefault = URP.AntialiasingMode.
+		#if AINI
+			SubpixelMorphologicalAntiAliasing
+		#elif AINS
+			TemporalAntiAliasing
+		#endif
+		;
+
 		#region Preferences Setup
 
 		QualityPrefs = SomniumMelon.PrefCategoryInit("QualitySettings");
@@ -47,7 +55,7 @@ static class QualityFixes {
 
 		AntialiasingMode = QualityPrefs.CreateEntry(
 			"AntialiasingMode",
-			URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing,
+			AntialiasingModeDefault,
 			"Antialiasing Mode",
 
 			$"The type of antialiasing to set UniversalAdditionalCameraData instances to use"

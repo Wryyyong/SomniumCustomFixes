@@ -11,16 +11,16 @@ class SettingInfo {
 }
 
 class SettingInfo<T> : SettingInfo where T : uObject {
-	internal SettingInfo(string name,object trgt) {
+	internal SettingInfo(string name,object targetVal) {
 		var type = typeof(T);
 		var property = type.GetProperty(name,AccessTools.all);
 
-		if (property is null) return;
+		ArgumentNullException.ThrowIfNull(property);
 
 		Type = type;
 		Property = property;
 
-		TargetValue = trgt;
+		TargetValue = targetVal;
 
 		var hasSetter = property.SetMethod is not null;
 
