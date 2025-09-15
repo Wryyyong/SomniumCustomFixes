@@ -34,6 +34,8 @@ class SomniumMelon : MelonMod {
 	internal static HarmonyLib.Harmony HarmonyInst;
 	static MelonLogger.Instance Logger;
 
+	static readonly HashSet<MelonPreferences_Category> PreferenceCategories = [];
+
 	internal static MelonPreferences_Category PrefDebug;
 	internal static MelonPreferences_Category PrefMisc;
 
@@ -41,7 +43,9 @@ class SomniumMelon : MelonMod {
 
 	internal static MelonPreferences_Category PrefCategoryInit(string categoryName) {
 		var category = MelonPreferences.CreateCategory(categoryName);
-		category.SetFilePath($"UserData/{ModTitle}.ini");
+		category.SetFilePath($"UserData/{ModTitle}.ini",true,false);
+
+		PreferenceCategories.Add(category);
 
 		return category;
 	}
@@ -72,5 +76,8 @@ class SomniumMelon : MelonMod {
 		GetType().Assembly.GetTypes()
 			.Select(type => type.GetMethod("Init",AccessTools.all))
 			.ToList().ForEach(method => method?.Invoke(null,null));
+
+		foreach (var category in PreferenceCategories)
+			category.SaveToFile(false);
 	}
 }
