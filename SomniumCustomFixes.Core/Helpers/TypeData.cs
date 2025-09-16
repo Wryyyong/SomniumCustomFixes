@@ -1,17 +1,27 @@
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-
 namespace SomniumCustomFixes.Helpers;
 
 class TypeData {
 	internal static readonly Dictionary<Type,TypeData> RegisteredTypes = [];
 
-	internal Func<Il2CppArrayBase> GetAllObjects { get; init; }
 	internal Dictionary<MethodBase,MethodBase> Properties { get; init; } = [];
 	internal Dictionary<MethodBase,object> TargetSettings { get; init; } = [];
 	internal Dictionary<MelonPreferences_Entry,HashSet<MethodBase>> PreferenceBindings { get; init; } = [];
-	internal Dictionary<object,Dictionary<MethodBase,object>> Cache { get; init; } = [];
 
-	internal void CleanCache() {
+	// Overriden with Generic versions
+	internal Dictionary<uObject,Dictionary<MethodBase,object>> Cache { get; init; }
+	internal Dictionary<MethodBase,SettingInfo.Condition<uObject>> Conditionals { get; init; }
+
+	internal virtual void CleanCache() {}
+	internal virtual void UpdateCache() {}
+	internal virtual void Refresh() {}
+	internal virtual void FullUpdate() {}
+}
+
+class TypeData<T> : TypeData where T : uObject {
+	internal new Dictionary<T,Dictionary<MethodBase,object>> Cache { get; init; } = [];
+	internal new Dictionary<MethodBase,SettingInfo.Condition<T>> Conditionals { get; init; } = [];
+
+	internal override void CleanCache() {
 		foreach (var obj in Cache.Keys) {
 			if (
 				!(
@@ -26,8 +36,8 @@ class TypeData {
 		}
 	}
 
-	internal void UpdateCache() {
-		foreach (var obj in GetAllObjects()) {
+	internal override void UpdateCache() {
+		foreach (var obj in Resources.FindObjectsOfTypeAll<T>()) {
 			if (Cache.ContainsKey(obj)) continue;
 
 			var oldValList = new Dictionary<MethodBase,object>();
@@ -35,7 +45,7 @@ class TypeData {
 		}
 	}
 
-	internal void Refresh() {
+	internal override void Refresh() {
 		var paramList = new object[1];
 		ref var newVal = ref paramList[0];
 
@@ -49,14 +59,19 @@ class TypeData {
 				var setter = property.Key;
 				var oldVal = property.Value?.Invoke(obj,null);
 
+				Conditionals.TryGetValue(setter,out var condition);
+
 				if (
-					!TargetSettings.TryGetValue(setter,out newVal)
+					!(
+						TargetSettings.TryGetValue(setter,out newVal)
+					&&	condition(obj,ref newVal)
+				)
 				||	newVal.Equals(oldVal)
 				) continue;
 
-				oldValList.TryAdd(setter,oldVal);
+				oldValList[setter] = oldVal;
 
-				logMsgs?.Add($"{(obj as uObject).name} :: {setter.Name} | {oldVal} -> {newVal}");
+				logMsgs?.Add($"{obj.name} :: {setter.Name} | {oldVal} -> {newVal}");
 				setter.Invoke(obj,paramList);
 			}
 		}
@@ -64,19 +79,15 @@ class TypeData {
 		SomniumMelon.EasyLog([.. logMsgs]);
 	}
 
-	internal void FullUpdate() {
+	internal override void FullUpdate() {
 		CleanCache();
 		UpdateCache();
 		Refresh();
 	}
-}
 
-class TypeData<T> : TypeData where T : uObject {
 	internal TypeData() {
 		var type = typeof(T);
 		if (RegisteredTypes.ContainsKey(type)) return;
-
-		GetAllObjects = Resources.FindObjectsOfTypeAll<T>;
 
 		RegisteredTypes.TryAdd(type,this);
 	}

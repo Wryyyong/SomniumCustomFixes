@@ -11,11 +11,12 @@ static class QualityFixes {
 
 	static MelonPreferences_Entry<URP.ShadowResolution> URPShadowResolution;
 	static MelonPreferences_Entry<URP.AntialiasingMode> AntialiasingMode;
-	static MelonPreferences_Entry<URP.AntialiasingQuality> AntialiasingQuality;
+	static MelonPreferences_Entry<URP.AntialiasingQuality> SMAAQuality;
 
 	static void Init() {
 		const int DefaultPixelLights = 4;
 		const URP.ShadowCascadesOption ShadowCascades = URP.ShadowCascadesOption.FourCascades;
+
 		const URP.ShadowResolution MaxURPShadowRes = URP.ShadowResolution.
 		#if AINI
 			_4096
@@ -32,7 +33,7 @@ static class QualityFixes {
 		#endif
 		;
 
-		#region Preferences Setup
+	#region Preferences Setup
 
 		QualityPrefs = SomniumMelon.PrefCategoryInit("QualitySettings");
 
@@ -69,8 +70,8 @@ static class QualityFixes {
 		#endif
 		);
 
-		AntialiasingQuality = QualityPrefs.CreateEntry(
-			"AntialiasingQuality",
+		SMAAQuality = QualityPrefs.CreateEntry(
+			"SMAAQuality",
 			URP.AntialiasingQuality.High,
 			"SMAA Quality",
 
@@ -106,10 +107,10 @@ static class QualityFixes {
 		URPShadowResolution.OnEntryValueChangedUntyped.Subscribe(RefreshURPAsset);
 
 		AntialiasingMode.OnEntryValueChangedUntyped.Subscribe(RefreshUACD);
-		AntialiasingQuality.OnEntryValueChangedUntyped.Subscribe(RefreshUACD);
+		SMAAQuality.OnEntryValueChangedUntyped.Subscribe(RefreshUACD);
 
-		#endregion
-		#region SettingInfo Setup
+	#endregion
+	#region SettingInfo Setup
 
 		var harmony = SomniumMelon.HarmonyInst;
 		var paramList = new object[1];
@@ -203,12 +204,23 @@ static class QualityFixes {
 			),
 
 			new SettingInfo<URP.UniversalAdditionalCameraData>(
+				nameof(URP.UniversalAdditionalCameraData.renderPostProcessing),
+				true,
+				(obj,ref _) => obj.requiresDepthOption is not URP.CameraOverrideOption.Off
+			),
+			new SettingInfo<URP.UniversalAdditionalCameraData>(
+				nameof(URP.UniversalAdditionalCameraData.renderShadows),
+				true
+			),
+			new SettingInfo<URP.UniversalAdditionalCameraData>(
 				nameof(URP.UniversalAdditionalCameraData.antialiasing),
-				AntialiasingMode
+				AntialiasingMode,
+				(obj,ref _) => obj.renderPostProcessing
 			),
 			new SettingInfo<URP.UniversalAdditionalCameraData>(
 				nameof(URP.UniversalAdditionalCameraData.antialiasingQuality),
-				AntialiasingQuality
+				SMAAQuality,
+				(obj,ref _) => obj.antialiasing is URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing
 			),
 
 		#if AINS
@@ -218,32 +230,14 @@ static class QualityFixes {
 			),
 		#endif
 		],info => {
-			var pref = info.PrefEntry;
-			var property = info.Property;
-			var getter = property.GetMethod;
-			var setter = property.SetMethod;
+			info.InitializeTypeData();
 
-			if (info.DoPatchStatic)
-				harmony.Patch(setter,staticPatch);
+			if (!info.DoPatchStatic) return;
 
-			TypeData.RegisteredTypes.TryGetValue(info.Type,out var data);
-			data.Properties.TryAdd(setter,getter);
-
-			data.TargetSettings.TryAdd(setter,info.TargetValue);
-
-			if (pref is null) return;
-
-			var bindings = data.PreferenceBindings;
-
-			if (!bindings.TryGetValue(pref,out var prefSetters)) {
-				prefSetters = [];
-				bindings.TryAdd(pref,prefSetters);
-			}
-
-			prefSetters.Add(setter);
+			harmony.Patch(info.Property.SetMethod,staticPatch);
 		});
 
-		#endregion
+	#endregion
 	}
 
 	[HarmonyPatch(typeof(uObject),nameof(uObject.Destroy),[typeof(uObject),typeof(float)])]
