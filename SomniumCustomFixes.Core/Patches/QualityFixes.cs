@@ -206,7 +206,7 @@ static class QualityFixes {
 			new SettingInfo<URP.UniversalAdditionalCameraData>(
 				nameof(URP.UniversalAdditionalCameraData.renderPostProcessing),
 				true,
-				(obj,ref _) => obj.requiresDepthOption is not URP.CameraOverrideOption.Off
+				(obj,ref _) => obj.requiresDepthTexture
 			),
 			new SettingInfo<URP.UniversalAdditionalCameraData>(
 				nameof(URP.UniversalAdditionalCameraData.renderShadows),
@@ -215,7 +215,24 @@ static class QualityFixes {
 			new SettingInfo<URP.UniversalAdditionalCameraData>(
 				nameof(URP.UniversalAdditionalCameraData.antialiasing),
 				AntialiasingMode,
-				(obj,ref _) => obj.renderPostProcessing
+				(obj,ref newVal) => {
+					if (!obj.renderPostProcessing)
+						return false;
+
+				#if AINS
+					if (newVal is URP.AntialiasingMode.TemporalAntiAliasing) {
+						if (obj.GetComponent<Il2CppGame.BustShotCamera>())
+							newVal = URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing;
+						else {
+							var field = typeof(URP.TemporalAA.Settings).GetField(nameof(URP.TemporalAA.Settings.m_Quality),AccessTools.all);
+
+							field.SetValue(obj.taaSettings,URP.TemporalAAQuality.VeryHigh);
+						}
+					}
+				#endif
+
+					return true;
+				}
 			),
 			new SettingInfo<URP.UniversalAdditionalCameraData>(
 				nameof(URP.UniversalAdditionalCameraData.antialiasingQuality),
