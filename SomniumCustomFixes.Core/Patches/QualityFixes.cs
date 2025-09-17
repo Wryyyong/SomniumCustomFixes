@@ -119,6 +119,15 @@ static class QualityFixes {
 		var staticPatch = new HarmonyMethod(typeof(QualityFixes).GetMethod(nameof(StaticPatch),AccessTools.all));
 
 		Array.ForEach<SettingInfo>([
+			new SettingInfo<Light>(
+				nameof(Light.renderMode),
+				LightRenderMode.ForcePixel
+			),
+			new SettingInfo<Light>(
+				nameof(Light.shadows),
+				LightShadows.Soft
+			),
+
 			new SettingInfo<QualitySettings>(
 				nameof(QualitySettings.anisotropicFiltering),
 				AnisotropicFiltering.ForceEnable
