@@ -1,94 +1,104 @@
 namespace SomniumCustomFixes.Helpers;
 
 class TypeData {
-	internal static readonly Dictionary<Type,TypeData> RegisteredTypes = [];
-
-	internal Dictionary<MethodBase,MethodBase> Properties { get; init; } = [];
-	internal Dictionary<MethodBase,object> TargetSettings { get; init; } = [];
-	internal Dictionary<MelonPreferences_Entry,HashSet<MethodBase>> PreferenceBindings { get; init; } = [];
-
-	// Overriden with Generic versions
-	internal Dictionary<uObject,Dictionary<MethodBase,object>> Cache { get; init; }
-	internal Dictionary<MethodBase,Condition<uObject>> Conditionals { get; init; }
-
-	internal virtual void CleanCache() {}
-	internal virtual void UpdateCache() {}
-	internal virtual void Refresh() {}
-	internal virtual void FullUpdate() {}
+	protected static readonly Dictionary<(Type,Type),TypeData> RegisteredTypes = [];
 }
 
-class TypeData<T> : TypeData where T : uObject {
-	internal new Dictionary<T,Dictionary<MethodBase,object>> Cache { get; init; } = [];
-	internal new Dictionary<MethodBase,Condition<T>> Conditionals { get; init; } = [];
+class TypeData<Class,Value> : TypeData where Class : uObject {
+	static readonly object[] ParamList = [null];
 
-	internal override void CleanCache() {
+	internal Dictionary<MethodBase,SettingInfo<Class,Value>> InfoData { get; init; } = [];
+	internal Dictionary<MelonPreferences_Entry<Value>,HashSet<SettingInfo<Class,Value>>> PreferenceBindings { get; init; } = [];
+	internal Dictionary<Class,Dictionary<SettingInfo<Class,Value>,Value>> Cache { get; init; } = [];
+
+	internal static TypeData<Class,Value> GetTypeData() =>
+		(TypeData<Class,Value>)RegisteredTypes[(typeof(Class),typeof(Value))];
+
+	internal void CleanCache() {
 		foreach (var obj in Cache.Keys) {
 			if (
 				!(
 					obj is null
-				||	(
-						obj is uObject uObj
-					&&	!uObj
-				)
+				||	!obj
 			)) continue;
 
 			Cache.Remove(obj);
 		}
 	}
 
-	internal override void UpdateCache() {
-		foreach (var obj in Resources.FindObjectsOfTypeAll<T>()) {
+	internal void UpdateCache() {
+		foreach (var obj in Resources.FindObjectsOfTypeAll<Class>()) {
 			if (Cache.ContainsKey(obj)) continue;
 
-			var oldValList = new Dictionary<MethodBase,object>();
-			Cache.TryAdd(obj,oldValList);
+			Cache.Add(obj,[]);
 		}
 	}
 
-	internal override void Refresh() {
-		var paramList = new object[1];
-		ref var newVal = ref paramList[0];
-
+	internal void Refresh() {
+		ref var paramVal = ref ParamList[0];
 		var logMsgs = new List<string>();
 
-		foreach (var set in Cache) {
-			var obj = set.Key;
-			var oldValList = set.Value;
+		try {
+			foreach (var set in Cache) {
+				var obj = set.Key;
+				var oldValList = set.Value;
 
-			foreach (var property in Properties) {
-				var setter = property.Key;
-				var oldVal = property.Value?.Invoke(obj,null);
+				foreach (var info in InfoData.Values) {
+					var setter = info.Setter;
+					var oldVal = (Value)info.Getter?.Invoke(obj,null);
+					Value newVal;
 
-				Conditionals.TryGetValue(setter,out var condition);
+					if (info.DoAutoPatch)
+						newVal = oldVal;
+					else {
+						newVal = info.TargetValue;
 
-				if (
-					!(
-						TargetSettings.TryGetValue(setter,out newVal)
-					&&	condition(obj,ref newVal)
-				)
-				||	newVal.Equals(oldVal)
-				) continue;
+						if (
+							!info.Conditional(obj,ref newVal)
+						||	newVal.Equals(oldVal)
+						) continue;
 
-				oldValList[setter] = oldVal;
+						if (info.DoLogging)
+							logMsgs.Add($"{obj.name} :: {setter.Name} | {oldVal} -> {newVal}");
+					}
 
-				logMsgs?.Add($"{obj.name} :: {setter.Name} | {oldVal} -> {newVal}");
-				setter.Invoke(obj,paramList);
+					paramVal = newVal;
+					oldValList[info] = oldVal;
+
+					setter.Invoke(obj,ParamList);
+				}
 			}
+		} catch {
+		} finally {
+			paramVal = null;
 		}
 
 		SomniumMelon.EasyLog([.. logMsgs]);
 	}
 
-	internal override void FullUpdate() {
+	internal void FullUpdate() {
 		CleanCache();
 		UpdateCache();
 		Refresh();
 	}
 
-	internal TypeData() {
-		var type = typeof(T);
-		if (RegisteredTypes.ContainsKey(type)) return;
+	internal TypeData(SettingInfo<Class,Value> info,out bool doPatch) {
+		doPatch = RegisteredTypes.TryAdd(info.Types,this);
+		var data = GetTypeData();
 
-		RegisteredTypes.TryAdd(type,this);
+		data.InfoData.TryAdd(info.Setter,info);
+
+		var prefEntry = info.PrefEntry;
+
+		if (prefEntry is null) return;
+
+		var bindings = data.PreferenceBindings;
+
+		if (!bindings.TryGetValue(prefEntry,out var prefInfos)) {
+			prefInfos = [];
+			bindings.TryAdd(prefEntry,prefInfos);
+		}
+
+		prefInfos.Add(info);
 	}
 }
