@@ -9,7 +9,7 @@ class TypeData {
 
 	// Overriden with Generic versions
 	internal Dictionary<uObject,Dictionary<MethodBase,object>> Cache { get; init; }
-	internal Dictionary<MethodBase,SettingInfo.Condition<uObject>> Conditionals { get; init; }
+	internal Dictionary<MethodBase,Condition<uObject>> Conditionals { get; init; }
 
 	internal virtual void CleanCache() {}
 	internal virtual void UpdateCache() {}
@@ -19,7 +19,7 @@ class TypeData {
 
 class TypeData<T> : TypeData where T : uObject {
 	internal new Dictionary<T,Dictionary<MethodBase,object>> Cache { get; init; } = [];
-	internal new Dictionary<MethodBase,SettingInfo.Condition<T>> Conditionals { get; init; } = [];
+	internal new Dictionary<MethodBase,Condition<T>> Conditionals { get; init; } = [];
 
 	internal override void CleanCache() {
 		foreach (var obj in Cache.Keys) {

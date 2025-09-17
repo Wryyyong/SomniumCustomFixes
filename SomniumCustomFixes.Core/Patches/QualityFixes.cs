@@ -113,9 +113,6 @@ static class QualityFixes {
 	#region SettingInfo Setup
 
 		var harmony = SomniumMelon.HarmonyInst;
-		var paramList = new object[1];
-		ref var defaultVal = ref paramList[0];
-
 		var staticPatch = new HarmonyMethod(typeof(QualityFixes).GetMethod(nameof(StaticPatch),AccessTools.all));
 
 		Array.ForEach<SettingInfo>([
@@ -260,7 +257,7 @@ static class QualityFixes {
 
 			if (!info.DoPatchStatic) return;
 
-			harmony.Patch(info.Property.SetMethod,staticPatch);
+			harmony.Patch(info.Setter,staticPatch);
 		});
 
 	#endregion
