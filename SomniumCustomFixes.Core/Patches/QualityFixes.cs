@@ -24,6 +24,8 @@ static class QualityFixes {
 
 #if AINS
 	static MelonPreferences_Entry<URP.TemporalAAQuality> TAAQuality;
+
+	static URP.TemporalAA.Settings CustomTAASettings;
 #endif
 
 	static void Init() {
@@ -103,23 +105,6 @@ static class QualityFixes {
 		+	$"\n- \"{URP.AntialiasingQuality.High}\""
 		);
 
-	#if AINS
-		TAAQuality = QualityPrefs.CreateEntry(
-			"TAAQuality",
-			URP.TemporalAAQuality.VeryHigh,
-			"TAA Quality",
-
-			$"The level of quality to use for TAA"
-		+	$"\nHas no effect unless AntialiasingMode is set to \"{URP.AntialiasingMode.TemporalAntiAliasing}\""
-		+	$"\nPossible values:"
-		+	$"\n- \"{URP.TemporalAAQuality.VeryLow}\""
-		+	$"\n- \"{URP.TemporalAAQuality.Low}\""
-		+	$"\n- \"{URP.TemporalAAQuality.Medium}\""
-		+	$"\n- \"{URP.TemporalAAQuality.High}\""
-		+	$"\n- \"{URP.TemporalAAQuality.VeryHigh}\""
-		);
-	#endif
-
 		static void RefreshSettings<Class,Value>() where Class : uObject {
 			var data = TypeData<Class,Value>.GetTypeData();
 
@@ -144,20 +129,50 @@ static class QualityFixes {
 		AntialiasingMode.OnEntryValueChanged.Subscribe(static (_,_) =>
 			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingMode>()
 		);
+
 		SMAAQuality.OnEntryValueChanged.Subscribe(static (_,_) =>
 			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingQuality>()
 		);
 
 	#if AINS
-		TAAQuality.OnEntryValueChanged.Subscribe(static (_,_) =>
-			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingQuality>()
+		TAAQuality = QualityPrefs.CreateEntry(
+			"TAAQuality",
+			URP.TemporalAAQuality.VeryHigh,
+			"TAA Quality",
+
+			$"The level of quality to use for TAA"
+		+	$"\nHas no effect unless AntialiasingMode is set to \"{URP.AntialiasingMode.TemporalAntiAliasing}\""
+		+	$"\nPossible values:"
+		+	$"\n- \"{URP.TemporalAAQuality.VeryLow}\""
+		+	$"\n- \"{URP.TemporalAAQuality.Low}\""
+		+	$"\n- \"{URP.TemporalAAQuality.Medium}\""
+		+	$"\n- \"{URP.TemporalAAQuality.High}\""
+		+	$"\n- \"{URP.TemporalAAQuality.VeryHigh}\""
 		);
+
+		CustomTAASettings = new() {
+		//	jitterFrameCountOffset = 0,
+			m_ContrastAdaptiveSharpening = .3f,
+			m_FrameInfluence = .1f,
+			m_JitterScale = 1f,
+			m_MipBias = -1f,
+			m_Quality = TAAQuality.Value,
+			m_VarianceClampScale = .9f,
+		//	resetHistoryFrames = 0,
+		};
+
+		TAAQuality.OnEntryValueChanged.Subscribe(static (_,newVal) => {
+			CustomTAASettings.m_Quality = newVal;
+
+			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingMode>();
+		});
 	#endif
 
 	#endregion
 	#region SettingInfo Setup
 
 		var harmony = SomniumMelon.HarmonyInst;
+		var autoPatchCache = new Dictionary<(Type,Type),(Type[],HarmonyMethod)>();
 
 		// Our methods
 		var autoPatch = typeof(QualityFixes).GetMethod(nameof(AutoPatch),AccessTools.all);
@@ -292,21 +307,11 @@ static class QualityFixes {
 						newVal = URP.AntialiasingMode.None;
 
 				#if AINS
-					if (newVal is URP.AntialiasingMode.TemporalAntiAliasing) {
+					if (newVal is URP.AntialiasingMode.TemporalAntiAliasing)
 						if (obj.GetComponent<Il2CppGame.BustShotCamera>())
 							newVal = URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing;
 						else
-							obj.m_TaaSettings = new() {
-							//	jitterFrameCountOffset = 0,
-								m_ContrastAdaptiveSharpening = .3f,
-								m_FrameInfluence = .1f,
-								m_JitterScale = 1f,
-								m_MipBias = -1f,
-								m_Quality = TAAQuality.Value,
-								m_VarianceClampScale = .9f,
-							//	resetHistoryFrames = 0,
-							};
-					}
+							obj.m_TaaSettings = CustomTAASettings;
 				#endif
 
 					return true;
@@ -325,36 +330,49 @@ static class QualityFixes {
 			),
 		#endif
 		],info => {
-			if (!info.InitializeTypeData()) return;
+			var newTypeData = info.InitializeTypeData();
 
 			var types = info.Types;
-			Type[] typeArray = [types.Item1,types.Item2];
 
-			var removeFromCachePatch = new HarmonyMethod(removeFromCache.MakeGenericMethod(typeArray));
+			if (!autoPatchCache.TryGetValue(types,out var cache)) {
+				Type[] newArray = [types.Item1,types.Item2];
+				cache = (newArray,new HarmonyMethod(autoPatch.MakeGenericMethod(newArray)));
+
+				autoPatchCache.Add(types,cache);
+			}
+
+			var typeArray = cache.Item1;
 
 			if (info.DoAutoPatch)
 				harmony.Patch(
 					info.Setter,
-					prefix: new HarmonyMethod(autoPatch.MakeGenericMethod(typeArray))
+					prefix: cache.Item2
 				);
 
-			harmony.Patch(
-				uObjDestroy,
-				prefix: removeFromCachePatch
-			);
-			harmony.Patch(
-				uObjDestroyImmediate,
-				prefix: removeFromCachePatch
-			);
+			if (
+				newTypeData
+			&&	info.DoTypeDataPatch
+			) {
+				var removeFromCachePatch = new HarmonyMethod(removeFromCache.MakeGenericMethod(typeArray));
 
-			harmony.Patch(
-				sceneLoad,
-				postfix: new HarmonyMethod(cacheObjs.MakeGenericMethod(typeArray))
-			);
-			harmony.Patch(
-				sceneUnload,
-				postfix: new HarmonyMethod(cleanCaches.MakeGenericMethod(typeArray))
-			);
+				harmony.Patch(
+					uObjDestroy,
+					prefix: removeFromCachePatch
+				);
+				harmony.Patch(
+					uObjDestroyImmediate,
+					prefix: removeFromCachePatch
+				);
+
+				harmony.Patch(
+					sceneLoad,
+					postfix: new HarmonyMethod(cacheObjs.MakeGenericMethod(typeArray))
+				);
+				harmony.Patch(
+					sceneUnload,
+					postfix: new HarmonyMethod(cleanCaches.MakeGenericMethod(typeArray))
+				);
+			}
 		});
 
 	#endregion

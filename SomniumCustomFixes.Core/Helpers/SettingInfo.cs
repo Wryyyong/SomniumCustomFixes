@@ -9,6 +9,7 @@ class SettingInfo {
 	internal MethodBase Getter { get; init; }
 
 	internal bool DoAutoPatch { get; init; }
+	internal bool DoTypeDataPatch { get; init; }
 	internal bool DoLogging { get; init; }
 
 	internal virtual bool InitializeTypeData() => false;
@@ -16,20 +17,20 @@ class SettingInfo {
 
 class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 	const bool Default_DoLogging = true;
+	static readonly Condition<Class,Value> Default_Conditional = static (_,ref _) => true;
 
 	internal Value TargetValue { get; set; }
 
 	internal MelonPreferences_Entry<Value> PrefEntry { get; init; }
-	internal Condition<Class,Value> Conditional { get; init; } = static (_,ref _) => true;
+	internal Condition<Class,Value> Conditional { get; init; }
 
-	// Ignore method results
-#pragma warning disable CA1806
 	internal override bool InitializeTypeData() {
+	#pragma warning disable CA1806
 		new TypeData<Class,Value>(this,out var doPatch);
+	#pragma warning restore CA1806
 
 		return doPatch;
 	}
-#pragma warning restore CA1806
 
 	internal SettingInfo(string name,MelonPreferences_Entry<Value> entry)
 		: this(name,entry,Default_DoLogging,null) {}
@@ -63,8 +64,9 @@ class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 		TargetValue = targetVal;
 
 		DoAutoPatch = typeClass.GetField($"NativeFieldInfoPtr_{name}",AccessTools.all) is null;
+		DoTypeDataPatch = !AccessTools.IsStatic(typeClass);
 		DoLogging = doLogging;
 
-		Conditional = conditional;
+		Conditional = conditional ?? Default_Conditional;
 	}
 }
