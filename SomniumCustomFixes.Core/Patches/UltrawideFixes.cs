@@ -189,20 +189,10 @@ static class UltrawideFixes {
 	}
 
 	[HarmonyPatch(typeof(SceneManager),nameof(SceneManager.Internal_SceneLoaded))]
+	[HarmonyPostfix]
+	static void SceneUpdate_Load(Scene scene) => GetCacheScene(scene);
+
 	[HarmonyPatch(typeof(SceneManager),nameof(SceneManager.Internal_SceneUnloaded))]
 	[HarmonyPostfix]
-	static void SceneUpdate(MethodBase __originalMethod,Scene scene) {
-		switch (__originalMethod.Name) {
-			case nameof(SceneManager.Internal_SceneLoaded):
-				GetCacheScene(scene);
-				break;
-
-			case nameof(SceneManager.Internal_SceneUnloaded):
-				Cache.Remove(scene);
-				break;
-
-			default:
-				return;
-		}
-	}
+	static void SceneUpdate_Unload(Scene scene) => Cache.Remove(scene);
 }
