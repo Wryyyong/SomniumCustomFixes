@@ -13,7 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TypeData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Patches\DisableMouseCursor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Patches\QualityFixes.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Patches\UltrawideFixes.cs" />
+    <None Include="$(MSBuildThisFileDirectory)Patches\UltrawideFixes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FixNullableAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SomniumMelon.cs" />
   </ItemGroup>
