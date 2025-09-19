@@ -14,10 +14,15 @@ record QualityFixPatchSet(
 
 [HarmonyPatch]
 static class QualityFixes {
-	static MelonPreferences_Category QualityPrefs;
 	static MelonPreferences_Category StylePrefs;
+	static MelonPreferences_Category QualityPrefs;
 
+	// Stylistic preferences
 	static MelonPreferences_Entry<bool> RenderCharacterModelOutlines;
+
+	// Quality preferences
+	static MelonPreferences_Entry<AnisotropicFiltering> AnisoMode;
+
 	static MelonPreferences_Entry<URP.ShadowResolution> URPShadowResolution;
 	static MelonPreferences_Entry<URP.AntialiasingMode> AntialiasingMode;
 	static MelonPreferences_Entry<URP.AntialiasingQuality> SMAAQuality;
@@ -50,7 +55,7 @@ static class QualityFixes {
 
 	#region Preferences Setup
 
-		QualityPrefs = SomniumMelon.PrefCategoryInit("QualitySettings");
+		// Stylistic preferences
 		StylePrefs = SomniumMelon.PrefCategoryInit("StylisticSettings");
 
 		RenderCharacterModelOutlines = StylePrefs.CreateEntry(
@@ -59,11 +64,27 @@ static class QualityFixes {
 			"Render character model outlines"
 		);
 
+		// Quality preferences
+		QualityPrefs = SomniumMelon.PrefCategoryInit("QualitySettings");
+
+		AnisoMode = QualityPrefs.CreateEntry(
+			"AnisotropicFilteringMode",
+			AnisotropicFiltering.ForceEnable,
+			"Anisotropic filtering mode",
+
+			$"Anisotropic filtering makes Textures look better when viewed at a shallow angle."
+		+	$"\nPossible values:"
+		+	$"\n- \"{AnisotropicFiltering.Disable}\""
+		+	$"\n- \"{AnisotropicFiltering.Enable}\""
+		+	$"\n- \"{AnisotropicFiltering.ForceEnable}\""
+		);
+
 		URPShadowResolution = QualityPrefs.CreateEntry(
 			"URP_ShadowResolution",
 			MaxURPShadowRes,
 			"Shadow Resolution",
-			$"The resolution to render shadows at"
+
+			$"The resolution to render shadows at, through the Universal Rendering Pipeline."
 		+	$"\nPossible values:"
 		+	$"\n- \"{URP.ShadowResolution._256}\""
 		+	$"\n- \"{URP.ShadowResolution._512}\""
@@ -81,7 +102,7 @@ static class QualityFixes {
 			AntialiasingModeDefault,
 			"Antialiasing Mode",
 
-			$"The type of antialiasing to set UniversalAdditionalCameraData instances to use"
+			$"The type of antialiasing to set UniversalAdditionalCameraData instances to use."
 		+	$"\nPossible values:"
 		+	$"\n- \"{URP.AntialiasingMode.None}\""
 		+	$"\n- \"{URP.AntialiasingMode.FastApproximateAntialiasing}\""
@@ -97,8 +118,8 @@ static class QualityFixes {
 			URP.AntialiasingQuality.High,
 			"SMAA Quality",
 
-			$"The level of quality to use for SMAA"
-		+	$"\nHas no effect unless AntialiasingMode is set to \"{URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing}\""
+			$"The level of quality to use for Subpixel Morphological Anti-Aliasing."
+		+	$"\nHas no effect unless AntialiasingMode is set to \"{URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing}\"."
 		+	$"\nPossible values:"
 		+	$"\n- \"{URP.AntialiasingQuality.Low}\""
 		+	$"\n- \"{URP.AntialiasingQuality.Medium}\""
@@ -118,9 +139,15 @@ static class QualityFixes {
 			data.Refresh();
 		}
 
+		static void RefreshAniso(object oldVal,object newVal) {
+			RefreshSettings<QualitySettings,AnisotropicFiltering>();
+		}
+
 		RenderCharacterModelOutlines.OnEntryValueChanged.Subscribe(static (_,_) =>
 			RefreshSettings<URP.ScriptableRendererFeature,bool>()
 		);
+
+		AnisoMode.OnEntryValueChangedUntyped.Subscribe(RefreshAniso);
 
 		URPShadowResolution.OnEntryValueChanged.Subscribe(static (_,_) =>
 			RefreshSettings<URP.UniversalRenderPipelineAsset,URP.ShadowResolution>()
@@ -140,8 +167,8 @@ static class QualityFixes {
 			URP.TemporalAAQuality.VeryHigh,
 			"TAA Quality",
 
-			$"The level of quality to use for TAA"
-		+	$"\nHas no effect unless AntialiasingMode is set to \"{URP.AntialiasingMode.TemporalAntiAliasing}\""
+			$"The level of quality to use for Temporal Anti-Aliasing."
+		+	$"\nHas no effect unless AntialiasingMode is set to \"{URP.AntialiasingMode.TemporalAntiAliasing}\"."
 		+	$"\nPossible values:"
 		+	$"\n- \"{URP.TemporalAAQuality.VeryLow}\""
 		+	$"\n- \"{URP.TemporalAAQuality.Low}\""
@@ -200,7 +227,7 @@ static class QualityFixes {
 
 			new SettingInfo<QualitySettings,AnisotropicFiltering>(
 				nameof(QualitySettings.anisotropicFiltering),
-				AnisotropicFiltering.ForceEnable
+				AnisoMode
 			),
 			new SettingInfo<QualitySettings,QualityLevel>(
 				nameof(QualitySettings.currentLevel),

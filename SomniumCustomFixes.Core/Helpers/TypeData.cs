@@ -6,6 +6,7 @@ class TypeData {
 
 class TypeData<Class,Value> : TypeData where Class : uObject {
 	static readonly object[] ParamList = [null];
+	static readonly List<string> LogMsgs = [];
 
 	internal Dictionary<MethodBase,SettingInfo<Class,Value>> InfoData { get; init; } = [];
 	internal Dictionary<MelonPreferences_Entry<Value>,HashSet<SettingInfo<Class,Value>>> PreferenceBindings { get; init; } = [];
@@ -36,7 +37,6 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 
 	internal void Refresh() {
 		ref var paramVal = ref ParamList[0];
-		var logMsgs = new List<string>();
 
 		try {
 			foreach (var set in Cache) {
@@ -59,7 +59,7 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 						) continue;
 
 						if (info.DoLogging)
-							logMsgs.Add($"{obj.name} :: {setter.Name} | {oldVal} -> {newVal}");
+							LogMsgs.Add($"{obj.name} :: {setter.Name} | {oldVal} -> {newVal}");
 					}
 
 					paramVal = newVal;
@@ -73,7 +73,8 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 			paramVal = null;
 		}
 
-		SomniumMelon.EasyLog([.. logMsgs]);
+		SomniumMelon.EasyLog([.. LogMsgs]);
+		LogMsgs.Clear();
 	}
 
 	internal void FullUpdate() {
