@@ -16,7 +16,7 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 		(TypeData<Class,Value>)RegisteredTypes[(typeof(Class),typeof(Value))];
 
 	internal static bool SetCheck(Class obj,SettingInfo<Class,Value> info,Value oldVal,ref Value newVal) =>
-		info.Conditional(obj,ref newVal)
+		info.SetCondition(obj,ref newVal)
 	&&	!newVal.Equals(oldVal);
 
 	internal void CleanCache() {
@@ -35,6 +35,13 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 		foreach (var obj in Resources.FindObjectsOfTypeAll<Class>()) {
 			if (Cache.ContainsKey(obj)) continue;
 
+			foreach (var info in InfoData.Values)
+				if (info.CacheCondition(obj))
+					goto Add;
+
+			continue;
+
+		Add:
 			Cache.Add(obj,[]);
 		}
 	}
@@ -61,11 +68,11 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 
 						if (info.DoLogging)
 							LogMsgs.Add($"{obj.name} :: {setter.Name} | {oldVal} -> {newVal}");
+
+						oldValList[info] = oldVal;
 					}
 
 					paramVal = newVal;
-					oldValList[info] = oldVal;
-
 					setter.Invoke(obj,ParamList);
 				}
 			}

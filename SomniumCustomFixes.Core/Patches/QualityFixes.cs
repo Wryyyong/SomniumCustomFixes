@@ -1,3 +1,7 @@
+using MelonLoader.Preferences;
+
+using Il2CppInterop.Runtime;
+
 using URP = UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
@@ -22,6 +26,8 @@ static class QualityFixes {
 
 	// Quality preferences
 	static MelonPreferences_Entry<AnisotropicFiltering> AnisoMode;
+	static MelonPreferences_Entry<int> AnisoLevel;
+	static MelonPreferences_Entry<FilterMode> TextureFilteringMode;
 
 	static MelonPreferences_Entry<URP.ShadowResolution> URPShadowResolution;
 	static MelonPreferences_Entry<URP.AntialiasingMode> AntialiasingMode;
@@ -77,6 +83,33 @@ static class QualityFixes {
 		+	$"\n- \"{AnisotropicFiltering.Disable}\""
 		+	$"\n- \"{AnisotropicFiltering.Enable}\""
 		+	$"\n- \"{AnisotropicFiltering.ForceEnable}\""
+		);
+
+		AnisoLevel = QualityPrefs.CreateEntry(
+			"AnisotropicFilteringLevel",
+			16,
+			"Anisotropic filtering level",
+
+			$"Defines the anisotropic filtering level of textures."
+		+	$"\nPossible values: 0-16"
+		+	$"\nHas certain effects when AnisotropicFilteringMode is set to \"{AnisotropicFiltering.ForceEnable}\":"
+		+	$"\n- If set to 0, Unity does not apply anisotropic filtering."
+		+	$"\n- If set between 1-9, Unity sets the value to 9.",
+			false,
+			false,
+			new ValueRange<int>(0,16)
+		);
+
+		TextureFilteringMode = QualityPrefs.CreateEntry(
+			"TextureFilteringMode",
+			FilterMode.Trilinear,
+			"Texture filtering mode",
+
+			$"Sets how textures are filtered."
+		+	$"\nPossible values:"
+		+	$"\n- \"{FilterMode.Point}\""
+		+	$"\n- \"{FilterMode.Bilinear}\""
+		+	$"\n- \"{FilterMode.Trilinear}\""
 		);
 
 		URPShadowResolution = QualityPrefs.CreateEntry(
@@ -141,6 +174,7 @@ static class QualityFixes {
 
 		static void RefreshAniso(object oldVal,object newVal) {
 			RefreshSettings<QualitySettings,AnisotropicFiltering>();
+			RefreshSettings<Texture,int>();
 		}
 
 		RenderCharacterModelOutlines.OnEntryValueChanged.Subscribe(static (_,_) =>
@@ -148,6 +182,11 @@ static class QualityFixes {
 		);
 
 		AnisoMode.OnEntryValueChangedUntyped.Subscribe(RefreshAniso);
+		AnisoLevel.OnEntryValueChangedUntyped.Subscribe(RefreshAniso);
+
+		TextureFilteringMode.OnEntryValueChanged.Subscribe(static (_,_) =>
+			RefreshSettings<Texture,FilterMode>()
+		);
 
 		URPShadowResolution.OnEntryValueChanged.Subscribe(static (_,_) =>
 			RefreshSettings<URP.UniversalRenderPipelineAsset,URP.ShadowResolution>()
@@ -215,6 +254,13 @@ static class QualityFixes {
 		var sceneLoad = typeof(SceneManager).GetMethod(nameof(SceneManager.Internal_SceneLoaded),AccessTools.all);
 		var sceneUnload = typeof(SceneManager).GetMethod(nameof(SceneManager.Internal_SceneUnloaded),AccessTools.all);
 
+		static bool TextureCheck(Texture obj) => obj.TryCast<RenderTexture>() is null;
+
+		static bool ModelOutlineCheck(URP.ScriptableRendererFeature obj) =>
+			obj.name is
+				"CharaOutLine"
+			or	"CharaOutLineMirror";
+
 		Array.ForEach<SettingInfo>([
 			new SettingInfo<Light,LightRenderMode>(
 				nameof(Light.renderMode),
@@ -223,6 +269,23 @@ static class QualityFixes {
 			new SettingInfo<Light,LightShadows>(
 				nameof(Light.shadows),
 				LightShadows.Soft
+			),
+
+			new SettingInfo<Texture,int>(
+				nameof(Texture.anisoLevel),
+				AnisoLevel,
+				true,
+				cacheCondition: TextureCheck,
+				setCondition: (obj,ref _) => TextureCheck(obj)
+			),
+			new SettingInfo<Texture,FilterMode>(
+				nameof(Texture.filterMode),
+				TextureFilteringMode,
+				cacheCondition: obj =>
+					TextureCheck(obj)
+				&&	obj.filterMode is not FilterMode.Point
+				,
+				setCondition: (obj,ref _) => TextureCheck(obj)
 			),
 
 			new SettingInfo<QualitySettings,AnisotropicFiltering>(
@@ -278,10 +341,8 @@ static class QualityFixes {
 			new SettingInfo<URP.ScriptableRendererFeature,bool>(
 				nameof(URP.ScriptableRendererFeature.m_Active),
 				RenderCharacterModelOutlines,
-				(obj,ref _) =>
-					obj.name is
-						"CharaOutLine"
-					or  "CharaOutLineMirror"
+				cacheCondition: ModelOutlineCheck,
+				setCondition: (obj,ref _) => ModelOutlineCheck(obj)
 			),
 
 			new SettingInfo<URP.UniversalRenderPipelineAsset,URP.ShadowResolution>(
@@ -320,7 +381,7 @@ static class QualityFixes {
 			new SettingInfo<URP.UniversalAdditionalCameraData,bool>(
 				nameof(URP.UniversalAdditionalCameraData.renderPostProcessing),
 				true,
-				(obj,ref _) => obj.requiresDepthTexture
+				setCondition: (obj,ref _) => obj.requiresDepthTexture
 			),
 			new SettingInfo<URP.UniversalAdditionalCameraData,bool>(
 				nameof(URP.UniversalAdditionalCameraData.renderShadows),
@@ -329,7 +390,7 @@ static class QualityFixes {
 			new SettingInfo<URP.UniversalAdditionalCameraData,URP.AntialiasingMode>(
 				nameof(URP.UniversalAdditionalCameraData.antialiasing),
 				AntialiasingMode,
-				(obj,ref newVal) => {
+				setCondition: (obj,ref newVal) => {
 					if (!obj.renderPostProcessing)
 						newVal = URP.AntialiasingMode.None;
 
@@ -347,7 +408,7 @@ static class QualityFixes {
 			new SettingInfo<URP.UniversalAdditionalCameraData,URP.AntialiasingQuality>(
 				nameof(URP.UniversalAdditionalCameraData.antialiasingQuality),
 				SMAAQuality,
-				(obj,ref _) => obj.antialiasing is URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing
+				setCondition: (obj,ref _) => obj.antialiasing is URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing
 			),
 
 		#if AINS
@@ -415,16 +476,30 @@ static class QualityFixes {
 		TypeData<Class,Value>.GetTypeData().CleanCache();
 
 	static void AutoPatch<Class,Value>(MethodBase __originalMethod,Class __instance,ref Value __0) where Class : uObject {
-		var info = TypeData<Class,Value>.GetTypeData().InfoData[__originalMethod];
+		var data = TypeData<Class,Value>.GetTypeData();
+		var info = data.InfoData[__originalMethod];
 		var newVal = info.TargetValue;
 
 		if (!TypeData<Class,Value>.SetCheck(__instance,info,__0,ref newVal)) return;
 
+		var instNull = __instance is null;
+
 		if (info.DoLogging)
 			SomniumMelon.EasyLog(
-				(__instance is null ? __originalMethod.DeclaringType.ToString() : __instance.name)
+				(instNull ? __originalMethod.DeclaringType.ToString() : __instance.name)
 			+	$" :: {__originalMethod.Name} | {__0} -> {newVal}"
 			);
+
+		if (!instNull) {
+			var cache = data.Cache;
+
+			if (!cache.TryGetValue(__instance,out var oldValList)) {
+				oldValList = [];
+				cache[__instance] = oldValList;
+			}
+
+			oldValList[info] = __0;
+		}
 
 		__0 = newVal;
 	}
