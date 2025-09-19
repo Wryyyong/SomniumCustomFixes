@@ -15,6 +15,10 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 	internal static TypeData<Class,Value> GetTypeData() =>
 		(TypeData<Class,Value>)RegisteredTypes[(typeof(Class),typeof(Value))];
 
+	internal static bool SetCheck(Class obj,SettingInfo<Class,Value> info,Value oldVal,ref Value newVal) =>
+		info.Conditional(obj,ref newVal)
+	&&	!newVal.Equals(oldVal);
+
 	internal void CleanCache() {
 		foreach (var obj in Cache.Keys) {
 			if (
@@ -53,10 +57,7 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 					else {
 						newVal = info.TargetValue;
 
-						if (
-							!info.Conditional(obj,ref newVal)
-						||	newVal.Equals(oldVal)
-						) continue;
+						if (!SetCheck(obj,info,oldVal,ref newVal)) continue;
 
 						if (info.DoLogging)
 							LogMsgs.Add($"{obj.name} :: {setter.Name} | {oldVal} -> {newVal}");

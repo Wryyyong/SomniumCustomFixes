@@ -418,10 +418,7 @@ static class QualityFixes {
 		var info = TypeData<Class,Value>.GetTypeData().InfoData[__originalMethod];
 		var newVal = info.TargetValue;
 
-		if (
-			!info.Conditional(__instance,ref newVal)
-		||	newVal.Equals(__0)
-		) return;
+		if (!TypeData<Class,Value>.SetCheck(__instance,info,__0,ref newVal)) return;
 
 		if (info.DoLogging)
 			SomniumMelon.EasyLog(
