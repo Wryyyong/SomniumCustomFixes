@@ -1,17 +1,19 @@
 <Project>
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+
     <LangVersion>preview</LangVersion>
+    <AnalysisLevel>preview-recommended</AnalysisLevel>
+    <WarningLevel>9999</WarningLevel>
+
     <Configurations>Release</Configurations>
     <BaseOutputPath>..\bin</BaseOutputPath>
-    <IsPublishable>False</IsPublishable>
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <Deterministic>False</Deterministic>
-    <WarningLevel>9999</WarningLevel>
-    <AnalysisLevel>preview-recommended</AnalysisLevel>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <IsPublishable>False</IsPublishable>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -22,7 +24,6 @@
 
   <ItemGroup>
     <PackageReference Include="HarmonyX" Version="$(Version_HarmonyX)" />
-    <PackageReference Include="Il2CppInterop.Common" Version="$(Version_Il2CppInterop)" />
     <PackageReference Include="Il2CppInterop.Runtime" Version="$(Version_Il2CppInterop)" />
     <PackageReference Include="LavaGang.MelonLoader" Version="$(Version_MelonLoader)" />
   </ItemGroup>
