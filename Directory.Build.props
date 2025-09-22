@@ -1,56 +1,11 @@
 <Project>
 
-  <PropertyGroup>
-    <TargetFramework>net6</TargetFramework>
-    <PlatformTarget>x64</PlatformTarget>
-
-    <LangVersion>preview</LangVersion>
-    <AnalysisLevel>preview-recommended</AnalysisLevel>
-    <WarningLevel>9999</WarningLevel>
-
-    <Configurations>Release</Configurations>
-    <BaseOutputPath>..\bin</BaseOutputPath>
-    <Deterministic>False</Deterministic>
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <IsPublishable>False</IsPublishable>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Version_MelonLoader>0.7.1</Version_MelonLoader>
-    <Version_HarmonyX>2.10.2</Version_HarmonyX>
-    <Version_Il2CppInterop>1.5.0</Version_Il2CppInterop>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="HarmonyX" Version="$(Version_HarmonyX)" />
-    <PackageReference Include="Il2CppInterop.Runtime" Version="$(Version_Il2CppInterop)" />
-    <PackageReference Include="LavaGang.MelonLoader" Version="$(Version_MelonLoader)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>External\Assembly-CSharp.stripped.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Il2Cppmscorlib">
-      <HintPath>External\Il2Cppmscorlib.stripped.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
-      <HintPath>External\Unity.RenderPipelines.Universal.Runtime.stripped.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>External\UnityEngine.CoreModule.stripped.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>External\UnityEngine.UI.stripped.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-
-  <Import Project="SomniumCustomFixes.Core\SomniumCustomFixes.Core.projitems" Label="Shared" />
+	<!-- Global settings -->
+	<PropertyGroup>
+		<ProjectName>SomniumCustomFixes</ProjectName>
+		<RootDir>$(MSBuildThisFileDirectory)</RootDir>
+		<RootNamespace>$(ProjectName)</RootNamespace>
+		<CommonPropertyFile>$(RootDir)CommonProperties.props</CommonPropertyFile>
+	</PropertyGroup>
 
 </Project>

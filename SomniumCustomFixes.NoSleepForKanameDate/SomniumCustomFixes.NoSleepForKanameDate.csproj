@@ -1,7 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);AINS</DefineConstants>
-  </PropertyGroup>
-
-</Project>

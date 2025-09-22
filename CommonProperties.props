@@ -1,0 +1,63 @@
+<Project>
+
+	<!-- Common filepaths -->
+	<PropertyGroup>
+		<ExtAssemblyDir>$(RootDir)\ExtAssemblies\$(TargetGame)</ExtAssemblyDir>
+	</PropertyGroup>
+
+	<!-- Project settings -->
+	<PropertyGroup>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<PlatformTarget>x64</PlatformTarget>
+
+		<AssemblyName>$(ProjectName).$(TargetGame)</AssemblyName>
+
+		<LangVersion>preview</LangVersion>
+		<AnalysisLevel>preview-recommended</AnalysisLevel>
+		<WarningLevel>9999</WarningLevel>
+
+		<Configurations>Release</Configurations>
+		<Deterministic>False</Deterministic>
+		<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<IsPublishable>False</IsPublishable>
+		<BaseOutputPath>$(RootDir)__bin</BaseOutputPath>
+	</PropertyGroup>
+
+	<!-- NuGet packages -->
+	<ItemGroup>
+		<PackageReference Include="HarmonyX" Version="2.10.2" />
+		<PackageReference Include="Il2CppInterop.Runtime" Version="1.5.0" />
+		<PackageReference Include="LavaGang.MelonLoader" Version="0.7.1" />
+	</ItemGroup>
+
+	<!-- External assemblies -->
+	<ItemGroup>
+		<Reference Include="Assembly-CSharp">
+			<HintPath>$(ExtAssemblyDir)\Assembly-CSharp.stripped.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Il2Cppmscorlib">
+			<HintPath>$(ExtAssemblyDir)\Il2Cppmscorlib.stripped.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Unity.RenderPipelines.Universal.Runtime">
+			<HintPath>$(ExtAssemblyDir)\Unity.RenderPipelines.Universal.Runtime.stripped.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>$(ExtAssemblyDir)\UnityEngine.CoreModule.stripped.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.UI">
+			<HintPath>$(ExtAssemblyDir)\UnityEngine.UI.stripped.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+
+	<!-- Load shared properties and projects -->
+	<Import Project="Core\Core.projitems" Label="Shared" />
+
+	<Import Project="Games\Loader.props" />
+
+</Project>

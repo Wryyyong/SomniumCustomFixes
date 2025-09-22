@@ -5,9 +5,6 @@
     <HasSharedItems>true</HasSharedItems>
     <SharedGUID>63d7afd4-7439-4e30-aba9-d73363ff49ca</SharedGUID>
   </PropertyGroup>
-  <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>SomniumCustomFixes.Core</Import_RootNamespace>
-  </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\SettingInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TypeData.cs" />

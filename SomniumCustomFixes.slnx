@@ -1,0 +1,28 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="_All" />
+    <BuildType Name="AI_TheSomniumFiles2" />
+    <BuildType Name="NoSleepForKanameDate" />
+  </Configurations>
+  <Folder Name="/Builds/">
+    <Project Path="Projects/AI_TheSomniumFiles2.csproj">
+      <BuildType Project="Release" />
+      <Build Solution="NoSleepForKanameDate|*" Project="false" />
+    </Project>
+    <Project Path="Projects/NoSleepForKanameDate.csproj">
+      <BuildType Project="Release" />
+      <Build Solution="AI_TheSomniumFiles2|*" Project="false" />
+    </Project>
+  </Folder>
+  <Folder Name="/Games/">
+    <File Path="Games/Selector.props" />
+    <Project Path="Games/AI_TheSomniumFiles2/AI_TheSomniumFiles2.shproj" Id="69a0265e-2523-4104-a734-01d949e5bdf0" />
+    <Project Path="Games/NoSleepForKanameDate/NoSleepForKanameDate.shproj" Id="1b7f974e-2adc-4018-ad9a-f163d9c4eda6" />
+  </Folder>
+  <Folder Name="/Misc./">
+    <File Path="CommonProperties.props" />
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Core/Core.shproj" />
+</Solution>
