@@ -3,9 +3,9 @@
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>1b7f974e-2adc-4018-ad9a-f163d9c4eda6</SharedGUID>
+    <SharedGUID>ef8f6d37-a8d2-4955-aabb-703fddf3713e</SharedGUID>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)NoSleepForKanameDate.props" />
+    <None Include="$(MSBuildThisFileDirectory)MelonLoader.props" />
   </ItemGroup>
 </Project>

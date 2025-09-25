@@ -1,0 +1,6 @@
+<Project>
+
+	<Import Project="$(TargetLoader)\$(TargetLoader).projitems" Label="Shared" />
+	<Import Project="$(TargetLoader)\$(TargetLoader).props" />
+
+</Project>

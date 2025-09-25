@@ -1,0 +1,10 @@
+<Project>
+
+	<!-- NuGet packages -->
+	<ItemGroup>
+		<PackageReference Include="HarmonyX" Version="2.10.2" />
+		<PackageReference Include="Il2CppInterop.Runtime" Version="1.5.0-ci.625" />
+		<PackageReference Include="LavaGang.MelonLoader" Version="0.7.1" />
+	</ItemGroup>
+
+</Project>

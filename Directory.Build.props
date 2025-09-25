@@ -1,11 +1,17 @@
 <Project>
 
 	<!-- Global settings -->
-	<PropertyGroup>
+	<PropertyGroup Label="Configuration">
 		<ProjectName>SomniumCustomFixes</ProjectName>
 		<RootDir>$(MSBuildThisFileDirectory)</RootDir>
 		<RootNamespace>$(ProjectName)</RootNamespace>
+		<Import_RootNamespace>$(ProjectName)</Import_RootNamespace>
 		<CommonPropertyFile>$(RootDir)CommonProperties.props</CommonPropertyFile>
+
+		<SharedObjDir>$(RootDir)__obj\$(MSBuildProjectName)</SharedObjDir>
+
+		<BaseIntermediateOutputPath>$(SharedObjDir)</BaseIntermediateOutputPath>
+		<MSBuildProjectExtensionsPath>$(SharedObjDir)</MSBuildProjectExtensionsPath>
 	</PropertyGroup>
 
 </Project>

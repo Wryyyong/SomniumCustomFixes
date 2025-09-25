@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetGame>AI_TheSomniumFiles2</TargetGame>
+		<TargetLoader>BepInEx</TargetLoader>
+	</PropertyGroup>
+
+	<Import Project="$(CommonPropertyFile)" />
+
+</Project>

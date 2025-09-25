@@ -1,23 +1,42 @@
 <Solution>
   <Configurations>
+    <BuildType Name="[Game] AI_TheSomniumFiles2" />
+    <BuildType Name="[Game] NoSleepForKanameDate" />
+    <BuildType Name="[Loader] BepInEx" />
+    <BuildType Name="[Loader] MelonLoader" />
     <BuildType Name="_All" />
-    <BuildType Name="AI_TheSomniumFiles2" />
-    <BuildType Name="NoSleepForKanameDate" />
   </Configurations>
   <Folder Name="/Builds/">
-    <Project Path="Projects/AI_TheSomniumFiles2.csproj">
+    <Project Path="Projects/AI_TheSomniumFiles2.BepInEx.csproj">
       <BuildType Project="Release" />
-      <Build Solution="NoSleepForKanameDate|*" Project="false" />
+      <Build Solution="[Game] NoSleepForKanameDate|*" Project="false" />
+      <Build Solution="[Loader] MelonLoader|*" Project="false" />
     </Project>
-    <Project Path="Projects/NoSleepForKanameDate.csproj">
+    <Project Path="Projects/AI_TheSomniumFiles2.MelonLoader.csproj">
       <BuildType Project="Release" />
-      <Build Solution="AI_TheSomniumFiles2|*" Project="false" />
+      <Build Solution="[Game] NoSleepForKanameDate|*" Project="false" />
+      <Build Solution="[Loader] BepInEx|*" Project="false" />
+    </Project>
+    <Project Path="Projects/NoSleepForKanameDate.BepInEx.csproj">
+      <BuildType Project="Release" />
+      <Build Solution="[Game] AI_TheSomniumFiles2|*" Project="false" />
+      <Build Solution="[Loader] MelonLoader|*" Project="false" />
+    </Project>
+    <Project Path="Projects/NoSleepForKanameDate.MelonLoader.csproj">
+      <BuildType Project="Release" />
+      <Build Solution="[Game] AI_TheSomniumFiles2|*" Project="false" />
+      <Build Solution="[Loader] BepInEx|*" Project="false" />
     </Project>
   </Folder>
   <Folder Name="/Games/">
-    <File Path="Games/Selector.props" />
+    <File Path="Games/Selector_Game.props" />
     <Project Path="Games/AI_TheSomniumFiles2/AI_TheSomniumFiles2.shproj" Id="69a0265e-2523-4104-a734-01d949e5bdf0" />
     <Project Path="Games/NoSleepForKanameDate/NoSleepForKanameDate.shproj" Id="1b7f974e-2adc-4018-ad9a-f163d9c4eda6" />
+  </Folder>
+  <Folder Name="/Loaders/">
+    <File Path="Loaders/Selector_Loader.props" />
+    <Project Path="Loaders/BepInEx/BepInEx.shproj" Id="049b79ca-eb29-44bf-98f3-a9a2e76e752d" />
+    <Project Path="Loaders/MelonLoader/MelonLoader.shproj" Id="ef8f6d37-a8d2-4955-aabb-703fddf3713e" />
   </Folder>
   <Folder Name="/Misc./">
     <File Path="CommonProperties.props" />

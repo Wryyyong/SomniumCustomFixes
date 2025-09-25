@@ -3,9 +3,9 @@
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>1b7f974e-2adc-4018-ad9a-f163d9c4eda6</SharedGUID>
+    <SharedGUID>049b79ca-eb29-44bf-98f3-a9a2e76e752d</SharedGUID>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)NoSleepForKanameDate.props" />
+    <None Include="$(MSBuildThisFileDirectory)BepInEx.props" />
   </ItemGroup>
 </Project>

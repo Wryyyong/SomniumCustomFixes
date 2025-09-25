@@ -2,6 +2,8 @@
 
 	<!-- Common filepaths -->
 	<PropertyGroup>
+		<ProjectTarget>$(TargetGame).$(TargetLoader)</ProjectTarget>
+
 		<ExtAssemblyDir>$(RootDir)\ExtAssemblies\$(TargetGame)</ExtAssemblyDir>
 	</PropertyGroup>
 
@@ -10,7 +12,7 @@
 		<TargetFramework>net6.0-windows</TargetFramework>
 		<PlatformTarget>x64</PlatformTarget>
 
-		<AssemblyName>$(ProjectName).$(TargetGame)</AssemblyName>
+		<AssemblyName>$(ProjectName).$(ProjectTarget)</AssemblyName>
 
 		<LangVersion>preview</LangVersion>
 		<AnalysisLevel>preview-recommended</AnalysisLevel>
@@ -21,15 +23,9 @@
 		<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
 		<IsPublishable>False</IsPublishable>
+
 		<BaseOutputPath>$(RootDir)__bin</BaseOutputPath>
 	</PropertyGroup>
-
-	<!-- NuGet packages -->
-	<ItemGroup>
-		<PackageReference Include="HarmonyX" Version="2.10.2" />
-		<PackageReference Include="Il2CppInterop.Runtime" Version="1.5.0" />
-		<PackageReference Include="LavaGang.MelonLoader" Version="0.7.1" />
-	</ItemGroup>
 
 	<!-- External assemblies -->
 	<ItemGroup>
@@ -58,6 +54,7 @@
 	<!-- Load shared properties and projects -->
 	<Import Project="Core\Core.projitems" Label="Shared" />
 
-	<Import Project="Games\Loader.props" />
+	<Import Project="Games\Selector_Game.props" />
+	<Import Project="Loaders\Selector_Loader.props" />
 
 </Project>
