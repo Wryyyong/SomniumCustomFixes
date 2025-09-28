@@ -1,5 +1,9 @@
 <Project>
 
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);MELON</DefineConstants>
+	</PropertyGroup>
+
 	<!-- NuGet packages -->
 	<ItemGroup>
 		<PackageReference Include="HarmonyX" Version="2.10.1" />

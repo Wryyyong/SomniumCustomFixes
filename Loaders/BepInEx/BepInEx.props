@@ -1,5 +1,9 @@
 <Project>
 
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);BEPIS</DefineConstants>
+	</PropertyGroup>
+
 	<!-- NuGet packages -->
 	<ItemGroup>
 		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />

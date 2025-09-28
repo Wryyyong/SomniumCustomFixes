@@ -5,6 +5,7 @@
 		<ProjectTarget>$(TargetGame).$(TargetLoader)</ProjectTarget>
 
 		<ExtAssemblyDir>$(RootDir)\ExtAssemblies\$(TargetGame)</ExtAssemblyDir>
+		<ExtAssemblyLoader>$(ExtAssemblyDir)\$(TargetLoader)</ExtAssemblyLoader>
 	</PropertyGroup>
 
 	<!-- Project settings -->
@@ -30,7 +31,7 @@
 	<!-- External assemblies -->
 	<ItemGroup>
 		<Reference Include="Assembly-CSharp">
-			<HintPath>$(ExtAssemblyDir)\Assembly-CSharp.stripped.dll</HintPath>
+			<HintPath>$(ExtAssemblyLoader)\Assembly-CSharp.stripped.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Il2Cppmscorlib">

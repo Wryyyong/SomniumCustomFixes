@@ -3,6 +3,17 @@ using Il2CppInterop.Runtime;
 using URP = UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
+#if AINS
+	using BustShotCamera =
+	#if BEPIS
+		Game
+	#elif MELON
+		Il2CppGame
+	#endif
+		.BustShotCamera
+	;
+#endif
+
 using SomniumCustomFixes.Helpers;
 
 namespace SomniumCustomFixes.Patches;
@@ -388,7 +399,7 @@ static class QualityFixes {
 
 				#if AINS
 					if (newVal is URP.AntialiasingMode.TemporalAntiAliasing)
-						if (obj.GetComponent<Il2CppGame.BustShotCamera>())
+						if (obj.GetComponent<BustShotCamera>())
 							newVal = URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing;
 						else
 							obj.m_TaaSettings = CustomTAASettings;

@@ -1,17 +1,24 @@
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-using Il2CppGame;
+using
+#if BEPIS
+	Game
+#elif MELON
+	Il2CppGame
+#endif
+;
 
 namespace SomniumCustomFixes.Patches;
 
 [HarmonyPatch]
 static class UltrawideFixes {
 	static readonly Dictionary<Type,string[]> TargetsExtend = new() {
-		{typeof(CinemaScope),[
+		[typeof(CinemaScope)] = [
 			nameof(CinemaScope.Show),
-		]},
-		{typeof(FilterController),[
+		],
+
+		[typeof(FilterController)] = [
 			nameof(FilterController.Black),
 			/*// Il2CppInterop currently doesn't like nullable parameters for some reason
 			nameof(FilterController.FadeIn),
@@ -22,13 +29,14 @@ static class UltrawideFixes {
 			nameof(FilterController.Set),
 			//*/
 			nameof(FilterController.SetValue),
-		]},
-		{typeof(EyeFadeFilter),[
+		],
+
+		[typeof(EyeFadeFilter)] = [
 			nameof(EyeFadeFilter.FadeIn),
 			nameof(EyeFadeFilter.FadeInWait),
 			nameof(EyeFadeFilter.FadeOut),
 			nameof(EyeFadeFilter.FadeOutWait),
-		]},
+		],
 	};
 
 	static ConfigElement<bool> DoUltrawideFixes;
