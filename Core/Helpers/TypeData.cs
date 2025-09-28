@@ -9,7 +9,7 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 	static readonly List<string> LogMsgs = [];
 
 	internal Dictionary<MethodBase,SettingInfo<Class,Value>> InfoData { get; init; } = [];
-	internal Dictionary<MelonPreferences_Entry<Value>,HashSet<SettingInfo<Class,Value>>> PreferenceBindings { get; init; } = [];
+	internal Dictionary<ConfigElement<Value>,HashSet<SettingInfo<Class,Value>>> ConfigBindings { get; init; } = [];
 	internal Dictionary<Class,Dictionary<SettingInfo<Class,Value>,Value>> Cache { get; init; } = [];
 
 	internal static TypeData<Class,Value> GetTypeData() =>
@@ -17,7 +17,8 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 
 	internal static bool SetCheck(Class obj,SettingInfo<Class,Value> info,Value oldVal,ref Value newVal) =>
 		info.SetCondition(obj,ref newVal)
-	&&	!newVal.Equals(oldVal);
+	&&	!newVal.Equals(oldVal)
+	;
 
 	internal void CleanCache() {
 		foreach (var obj in Cache.Keys) {
@@ -81,7 +82,7 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 			paramVal = null;
 		}
 
-		SomniumMelon.EasyLog([.. LogMsgs]);
+		SomniumCore.EasyLog([.. LogMsgs]);
 		LogMsgs.Clear();
 	}
 
@@ -97,17 +98,17 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 
 		data.InfoData.TryAdd(info.Setter,info);
 
-		var prefEntry = info.PrefEntry;
+		var element = info.ConfigElement;
 
-		if (prefEntry is null) return;
+		if (element is null) return;
 
-		var bindings = data.PreferenceBindings;
+		var bindings = data.ConfigBindings;
 
-		if (!bindings.TryGetValue(prefEntry,out var prefInfos)) {
-			prefInfos = [];
-			bindings.TryAdd(prefEntry,prefInfos);
+		if (!bindings.TryGetValue(element,out var confInfos)) {
+			confInfos = [];
+			bindings.TryAdd(element,confInfos);
 		}
 
-		prefInfos.Add(info);
+		confInfos.Add(info);
 	}
 }

@@ -1,5 +1,3 @@
-using MelonLoader.Preferences;
-
 using Il2CppInterop.Runtime;
 
 using URP = UnityEngine.Rendering.Universal;
@@ -18,28 +16,25 @@ record QualityFixPatchSet(
 
 [HarmonyPatch]
 static class QualityFixes {
-	static MelonPreferences_Category StylePrefs;
-	static MelonPreferences_Category QualityPrefs;
-
 	// Stylistic preferences
-	static MelonPreferences_Entry<bool> RenderCharacterModelOutlines;
+	static ConfigElement<bool> RenderCharacterModelOutlines;
 
 	// Quality preferences
-	static MelonPreferences_Entry<AnisotropicFiltering> AnisoMode;
-	static MelonPreferences_Entry<int> AnisoLevel;
-	static MelonPreferences_Entry<FilterMode> TextureFilteringMode;
+	static ConfigElement<AnisotropicFiltering> AnisoMode;
+	static ConfigElement<int> AnisoLevel;
+	static ConfigElement<FilterMode> TextureFilteringMode;
 
-	static MelonPreferences_Entry<URP.ShadowResolution> URPShadowResolution;
-	static MelonPreferences_Entry<URP.AntialiasingMode> AntialiasingMode;
-	static MelonPreferences_Entry<URP.AntialiasingQuality> SMAAQuality;
+	static ConfigElement<URP.ShadowResolution> URPShadowResolution;
+	static ConfigElement<URP.AntialiasingMode> AntialiasingMode;
+	static ConfigElement<URP.AntialiasingQuality> SMAAQuality;
 
 #if AINS
-	static MelonPreferences_Entry<URP.TemporalAAQuality> TAAQuality;
+	static ConfigElement<URP.TemporalAAQuality> TAAQuality;
 
 	static URP.TemporalAA.Settings CustomTAASettings;
 #endif
 
-	static void Init() {
+	static void PatchInit() {
 		const int DefaultPixelLights = 4;
 		const URP.ShadowCascadesOption ShadowCascades = URP.ShadowCascadesOption.FourCascades;
 
@@ -62,18 +57,16 @@ static class QualityFixes {
 	#region Preferences Setup
 
 		// Stylistic preferences
-		StylePrefs = SomniumMelon.PrefCategoryInit("StylisticSettings");
-
-		RenderCharacterModelOutlines = StylePrefs.CreateEntry(
+		RenderCharacterModelOutlines = new(
+			"StylisticSettings",
 			"RenderCharacterModelOutlines",
 			true,
 			"Render character model outlines"
 		);
 
 		// Quality preferences
-		QualityPrefs = SomniumMelon.PrefCategoryInit("QualitySettings");
-
-		AnisoMode = QualityPrefs.CreateEntry(
+		AnisoMode = new(
+			"QualitySettings",
 			"AnisotropicFilteringMode",
 			AnisotropicFiltering.ForceEnable,
 			"Anisotropic filtering mode",
@@ -85,7 +78,8 @@ static class QualityFixes {
 		+	$"\n- \"{AnisotropicFiltering.ForceEnable}\""
 		);
 
-		AnisoLevel = QualityPrefs.CreateEntry(
+		AnisoLevel = new(
+			"QualitySettings",
 			"AnisotropicFilteringLevel",
 			16,
 			"Anisotropic filtering level",
@@ -95,12 +89,11 @@ static class QualityFixes {
 		+	$"\nHas certain effects when AnisotropicFilteringMode is set to \"{AnisotropicFiltering.ForceEnable}\":"
 		+	$"\n- If set to 0, Unity does not apply anisotropic filtering."
 		+	$"\n- If set between 1-9, Unity sets the value to 9.",
-			false,
-			false,
-			new ValueRange<int>(0,16)
+			new ConfigRange<int>(0,16)
 		);
 
-		TextureFilteringMode = QualityPrefs.CreateEntry(
+		TextureFilteringMode = new(
+			"QualitySettings",
 			"TextureFilteringMode",
 			FilterMode.Trilinear,
 			"Texture filtering mode",
@@ -112,7 +105,8 @@ static class QualityFixes {
 		+	$"\n- \"{FilterMode.Trilinear}\""
 		);
 
-		URPShadowResolution = QualityPrefs.CreateEntry(
+		URPShadowResolution = new(
+			"QualitySettings",
 			"URP_ShadowResolution",
 			MaxURPShadowRes,
 			"Shadow Resolution",
@@ -130,7 +124,8 @@ static class QualityFixes {
 		#endif
 		);
 
-		AntialiasingMode = QualityPrefs.CreateEntry(
+		AntialiasingMode = new(
+			"QualitySettings",
 			"AntialiasingMode",
 			AntialiasingModeDefault,
 			"Antialiasing Mode",
@@ -146,7 +141,8 @@ static class QualityFixes {
 		#endif
 		);
 
-		SMAAQuality = QualityPrefs.CreateEntry(
+		SMAAQuality = new(
+			"QualitySettings",
 			"SMAAQuality",
 			URP.AntialiasingQuality.High,
 			"SMAA Quality",
@@ -162,7 +158,7 @@ static class QualityFixes {
 		static void RefreshSettings<Class,Value>() where Class : uObject {
 			var data = TypeData<Class,Value>.GetTypeData();
 
-			foreach (var binding in data.PreferenceBindings) {
+			foreach (var binding in data.ConfigBindings) {
 				var newVal = binding.Key.Value;
 
 				foreach (var info in binding.Value)
@@ -172,36 +168,32 @@ static class QualityFixes {
 			data.Refresh();
 		}
 
-		static void RefreshAniso(object oldVal,object newVal) {
+		static void RefreshAniso() {
 			RefreshSettings<QualitySettings,AnisotropicFiltering>();
 			RefreshSettings<Texture,int>();
 		}
 
-		RenderCharacterModelOutlines.OnEntryValueChanged.Subscribe(static (_,_) =>
-			RefreshSettings<URP.ScriptableRendererFeature,bool>()
-		);
+		AnisoMode.OnValueChangedNotify += RefreshAniso;
+		AnisoLevel.OnValueChangedNotify += RefreshAniso;
 
-		AnisoMode.OnEntryValueChangedUntyped.Subscribe(RefreshAniso);
-		AnisoLevel.OnEntryValueChangedUntyped.Subscribe(RefreshAniso);
+		RenderCharacterModelOutlines.OnValueChangedNotify += static () =>
+			RefreshSettings<URP.ScriptableRendererFeature,bool>();
 
-		TextureFilteringMode.OnEntryValueChanged.Subscribe(static (_,_) =>
-			RefreshSettings<Texture,FilterMode>()
-		);
+		TextureFilteringMode.OnValueChangedNotify += static () =>
+			RefreshSettings<Texture,FilterMode>();
 
-		URPShadowResolution.OnEntryValueChanged.Subscribe(static (_,_) =>
-			RefreshSettings<URP.UniversalRenderPipelineAsset,URP.ShadowResolution>()
-		);
+		URPShadowResolution.OnValueChangedNotify += static () =>
+			RefreshSettings<URP.UniversalRenderPipelineAsset,URP.ShadowResolution>();
 
-		AntialiasingMode.OnEntryValueChanged.Subscribe(static (_,_) =>
-			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingMode>()
-		);
+		AntialiasingMode.OnValueChangedNotify += static () =>
+			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingMode>();
 
-		SMAAQuality.OnEntryValueChanged.Subscribe(static (_,_) =>
-			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingQuality>()
-		);
+		SMAAQuality.OnValueChangedNotify += static () =>
+			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingQuality>();
 
 	#if AINS
-		TAAQuality = QualityPrefs.CreateEntry(
+		TAAQuality = new(
+			"QualitySettings",
 			"TAAQuality",
 			URP.TemporalAAQuality.VeryHigh,
 			"TAA Quality",
@@ -227,17 +219,17 @@ static class QualityFixes {
 		//	resetHistoryFrames = 0,
 		};
 
-		TAAQuality.OnEntryValueChanged.Subscribe(static (_,newVal) => {
+		TAAQuality.OnValueChanged += static newVal => {
 			CustomTAASettings.m_Quality = newVal;
 
 			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingMode>();
-		});
+		};
 	#endif
 
 	#endregion
 	#region SettingInfo Setup
 
-		var harmony = SomniumMelon.HarmonyInst;
+		var harmony = SomniumCore.HarmonyInstance;
 		var autoPatchCache = new Dictionary<(Type,Type),(Type[],HarmonyMethod)>();
 
 		// Our methods
@@ -276,16 +268,16 @@ static class QualityFixes {
 				AnisoLevel,
 				true,
 				cacheCondition: TextureCheck,
-				setCondition: (obj,ref _) => TextureCheck(obj)
+				setCondition: static (obj,ref _) => TextureCheck(obj)
 			),
 			new SettingInfo<Texture,FilterMode>(
 				nameof(Texture.filterMode),
 				TextureFilteringMode,
-				cacheCondition: obj =>
+				cacheCondition: static obj =>
 					TextureCheck(obj)
 				&&	obj.filterMode is not FilterMode.Point
 				,
-				setCondition: (obj,ref _) => TextureCheck(obj)
+				setCondition: static (obj,ref _) => TextureCheck(obj)
 			),
 
 			new SettingInfo<QualitySettings,AnisotropicFiltering>(
@@ -342,7 +334,7 @@ static class QualityFixes {
 				nameof(URP.ScriptableRendererFeature.m_Active),
 				RenderCharacterModelOutlines,
 				cacheCondition: ModelOutlineCheck,
-				setCondition: (obj,ref _) => ModelOutlineCheck(obj)
+				setCondition: static (obj,ref _) => ModelOutlineCheck(obj)
 			),
 
 			new SettingInfo<URP.UniversalRenderPipelineAsset,URP.ShadowResolution>(
@@ -381,7 +373,7 @@ static class QualityFixes {
 			new SettingInfo<URP.UniversalAdditionalCameraData,bool>(
 				nameof(URP.UniversalAdditionalCameraData.renderPostProcessing),
 				true,
-				setCondition: (obj,ref _) => obj.requiresDepthTexture
+				setCondition: static (obj,ref _) => obj.requiresDepthTexture
 			),
 			new SettingInfo<URP.UniversalAdditionalCameraData,bool>(
 				nameof(URP.UniversalAdditionalCameraData.renderShadows),
@@ -390,7 +382,7 @@ static class QualityFixes {
 			new SettingInfo<URP.UniversalAdditionalCameraData,URP.AntialiasingMode>(
 				nameof(URP.UniversalAdditionalCameraData.antialiasing),
 				AntialiasingMode,
-				setCondition: (obj,ref newVal) => {
+				setCondition: static (obj,ref newVal) => {
 					if (!obj.renderPostProcessing)
 						newVal = URP.AntialiasingMode.None;
 
@@ -408,7 +400,7 @@ static class QualityFixes {
 			new SettingInfo<URP.UniversalAdditionalCameraData,URP.AntialiasingQuality>(
 				nameof(URP.UniversalAdditionalCameraData.antialiasingQuality),
 				SMAAQuality,
-				setCondition: (obj,ref _) => obj.antialiasing is URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing
+				setCondition: static (obj,ref _) => obj.antialiasing is URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing
 			),
 
 		#if AINS
@@ -485,7 +477,7 @@ static class QualityFixes {
 		var instNull = __instance is null;
 
 		if (info.DoLogging)
-			SomniumMelon.EasyLog(
+			SomniumCore.EasyLog(
 				(instNull ? __originalMethod.DeclaringType.ToString() : __instance.name)
 			+	$" :: {__originalMethod.Name} | {__0} -> {newVal}"
 			);

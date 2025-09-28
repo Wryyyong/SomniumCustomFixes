@@ -2,15 +2,15 @@ namespace SomniumCustomFixes.Patches;
 
 [HarmonyPatch(typeof(Cursor),nameof(Cursor.visible),MethodType.Setter)]
 static class DisableMouseCursor {
-	static MelonPreferences_Entry<bool> RunPatch;
+	static ConfigElement<bool> RunPatch;
 
-	static void Init() {
-		RunPatch = SomniumMelon.PrefMisc.CreateEntry(
+	static void PatchInit() =>
+		RunPatch = new(
+			"Miscellaneous",
 			"DisableMouseCursor",
 			false,
 			"Disable mouse cursor"
 		);
-	}
 
 	static void Prefix(ref bool __0) {
 		if (!RunPatch.Value) return;

@@ -31,11 +31,9 @@ static class UltrawideFixes {
 		]},
 	};
 
-	static MelonPreferences_Category UltrawidePrefs;
-
-	static MelonPreferences_Entry<bool> DoUltrawideFixes;
-	static MelonPreferences_Entry<int> ResWidth;
-	static MelonPreferences_Entry<int> ResHeight;
+	static ConfigElement<bool> DoUltrawideFixes;
+	static ConfigElement<int> ResWidth;
+	static ConfigElement<int> ResHeight;
 
 	const float AspectRatioNative = 16f / 9f;
 
@@ -48,28 +46,29 @@ static class UltrawideFixes {
 	static Vector3 UWExtend = new(1f,1f,1f);
 	static Vector3 UWHorizontal = new(1f,1f,1f);
 
-	static void Init() {
+	static void PatchInit() {
 		var displayMain = Display.main;
 
-		UltrawidePrefs = SomniumMelon.PrefCategoryInit("UltrawideFixes");
-
-		DoUltrawideFixes = UltrawidePrefs.CreateEntry(
+		DoUltrawideFixes = new(
+			"UltrawideFixes",
 			"DoUltrawideFixes",
 			true,
 			"Fix ultrawide UI issues"
 		);
-		ResWidth = UltrawidePrefs.CreateEntry(
+		ResWidth = new(
+			"UltrawideFixes",
 			"CustomResolutionWidth",
 			displayMain.systemWidth,
 			"Custom resolution (width)"
 		);
-		ResHeight = UltrawidePrefs.CreateEntry(
+		ResHeight = new(
+			"UltrawideFixes",
 			"CustomResolutionHeight",
 			displayMain.systemHeight,
 			"Custom resolution (height)"
 		);
 
-		static void SetShouldBother(bool oldVal = false,bool newVal = false) {
+		static void SetShouldBother() {
 			ShouldBotherWithFixes =
 				DoUltrawideFixes.Value
 			&&	AspectRatioCustom > AspectRatioNative
@@ -82,7 +81,7 @@ static class UltrawideFixes {
 					set.Key.transform.localScale = set.Value;
 		}
 
-		static void ResolutionChanged(int oldVal = 0,int newVal = 0) {
+		static void ResolutionChanged() {
 			AspectRatioCustom = (float)ResWidth.Value / ResHeight.Value;
 			AspectRatioMultiplier = AspectRatioCustom / AspectRatioNative;
 
@@ -93,9 +92,9 @@ static class UltrawideFixes {
 			SetShouldBother();
 		}
 
-		DoUltrawideFixes.OnEntryValueChanged.Subscribe(SetShouldBother);
-		ResWidth.OnEntryValueChanged.Subscribe(ResolutionChanged);
-		ResHeight.OnEntryValueChanged.Subscribe(ResolutionChanged);
+		DoUltrawideFixes.OnValueChangedNotify += SetShouldBother;
+		ResWidth.OnValueChangedNotify += ResolutionChanged;
+		ResHeight.OnValueChangedNotify += ResolutionChanged;
 
 		ResolutionChanged();
 	}
