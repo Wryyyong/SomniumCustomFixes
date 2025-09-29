@@ -35,15 +35,15 @@ The development of this mod was inspired by ["AISomniumFiles2Fix"](https://codeb
 
 | Without mod | With mod, default settings |
 | :-: | :-: |
-| ![](__RepoAssets/AINI_Example1_Before.png) | ![](__RepoAssets/AINI_Example1_After.png) |
-| ![](__RepoAssets/AINI_Example2_Before.png) | ![](__RepoAssets/AINI_Example2_After.png) |
+| ![](_RepoAssets/AINI_Example1_Before.png) | ![](_RepoAssets/AINI_Example1_After.png) |
+| ![](_RepoAssets/AINI_Example2_Before.png) | ![](_RepoAssets/AINI_Example2_After.png) |
 
 <center><i><b>No Sleep For Kaname Date - From AI: THE SOMNIUM FILES</b></i></center>
 
 | Without mod | With mod, default settings |
 | :-: | :-: |
-| ![](__RepoAssets/AINS_Example1_Before.png) | ![](__RepoAssets/AINS_Example1_After.png) |
-| ![](__RepoAssets/AINS_Example2_Before.png) | ![](__RepoAssets/AINS_Example2_After.png) |
+| ![](_RepoAssets/AINS_Example1_Before.png) | ![](_RepoAssets/AINS_Example1_After.png) |
+| ![](_RepoAssets/AINS_Example2_Before.png) | ![](_RepoAssets/AINS_Example2_After.png) |
 
 ## Example configuration file
 Instead of storing its preferences in the shared `UserData/MelonPreferences.cfg` file, this mod uses its own configuration file: `UserData/SomniumCustomFixes.ini`.
