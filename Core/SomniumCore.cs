@@ -17,6 +17,7 @@ static class SomniumCore {
 	public const string ModTitle = "SomniumCustomFixes";
 	public const string ModVersion = "1.0.0";
 	public const string ModAuthor = "Wryyyong";
+	public const string ModReverseDNS = $"org.{ModAuthor}.{ModTitle}";
 
 	public const string GameDeveloper = "SpikeChunsoft";
 	public const string GameTarget =

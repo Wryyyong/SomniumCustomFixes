@@ -8,4 +8,9 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)BepInEx.props" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ConfigHandlerBepis.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConfigValidatorBepis.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SomniumLoaderBepis.cs" />
+  </ItemGroup>
 </Project>
