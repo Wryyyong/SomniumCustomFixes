@@ -18,7 +18,7 @@ sealed class ConfigHandlerBepis : ConfigHandler {
 			element.DefaultValue,
 
 			new(
-				element.LongDescription ?? string.Empty,
+				element.Description ?? string.Empty,
 				(AcceptableValueBase)element.Validator?.LoaderValidator
 			)
 		);

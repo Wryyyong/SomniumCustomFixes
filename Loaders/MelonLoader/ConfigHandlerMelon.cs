@@ -32,8 +32,8 @@ sealed class ConfigHandlerMelon : ConfigHandler {
 		var entry = GetCategory(element.Category).CreateEntry(
 			identifier,
 			element.DefaultValue,
-			element.ShortDescription,
-			element.LongDescription,
+			element.LongName,
+			element.Description,
 			false,
 			false,
 			(ValueValidator)element.Validator?.LoaderValidator

@@ -64,8 +64,7 @@ static class SomniumCore {
 		LogVerbose = new(
 			"Debugging",
 			"LogVerbose",
-			false,
-			"Verbose logging"
+			false
 		);
 
 		typeof(SomniumCore).Assembly.GetTypes()

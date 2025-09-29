@@ -8,8 +8,7 @@ static class DisableMouseCursor {
 		RunPatch = new(
 			"Miscellaneous",
 			"DisableMouseCursor",
-			false,
-			"Disable mouse cursor"
+			false
 		);
 
 	static void Prefix(ref bool __0) {

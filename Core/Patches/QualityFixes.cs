@@ -71,8 +71,7 @@ static class QualityFixes {
 		RenderCharacterModelOutlines = new(
 			"StylisticSettings",
 			"RenderCharacterModelOutlines",
-			true,
-			"Render character model outlines"
+			true
 		);
 
 		// Quality preferences
@@ -80,26 +79,20 @@ static class QualityFixes {
 			"QualitySettings",
 			"AnisotropicFilteringMode",
 			AnisotropicFiltering.ForceEnable,
-			"Anisotropic filtering mode",
 
-			$"Anisotropic filtering makes Textures look better when viewed at a shallow angle."
-		+	$"\nPossible values:"
-		+	$"\n- \"{AnisotropicFiltering.Disable}\""
-		+	$"\n- \"{AnisotropicFiltering.Enable}\""
-		+	$"\n- \"{AnisotropicFiltering.ForceEnable}\""
+			"Anisotropic filtering makes Textures look better when viewed at a shallow angle."
 		);
 
 		AnisoLevel = new(
 			"QualitySettings",
 			"AnisotropicFilteringLevel",
 			16,
-			"Anisotropic filtering level",
 
-			$"Defines the anisotropic filtering level of textures."
-		+	$"\nPossible values: 0-16"
+			"Defines the anisotropic filtering level of textures."
 		+	$"\nHas certain effects when AnisotropicFilteringMode is set to \"{AnisotropicFiltering.ForceEnable}\":"
-		+	$"\n- If set to 0, Unity does not apply anisotropic filtering."
-		+	$"\n- If set between 1-9, Unity sets the value to 9.",
+		+	"\n- If set to 0, Unity does not apply anisotropic filtering."
+		+	"\n- If set between 1-9, Unity sets the value to 9.",
+
 			new ConfigRange<int>(0,16)
 		);
 
@@ -107,63 +100,33 @@ static class QualityFixes {
 			"QualitySettings",
 			"TextureFilteringMode",
 			FilterMode.Trilinear,
-			"Texture filtering mode",
 
-			$"Sets how textures are filtered."
-		+	$"\nPossible values:"
-		+	$"\n- \"{FilterMode.Point}\""
-		+	$"\n- \"{FilterMode.Bilinear}\""
-		+	$"\n- \"{FilterMode.Trilinear}\""
+			"Sets how textures are filtered."
 		);
 
 		URPShadowResolution = new(
 			"QualitySettings",
 			"URP_ShadowResolution",
 			MaxURPShadowRes,
-			"Shadow Resolution",
 
-			$"The resolution to render shadows at, through the Universal Rendering Pipeline."
-		+	$"\nPossible values:"
-		+	$"\n- \"{URP.ShadowResolution._256}\""
-		+	$"\n- \"{URP.ShadowResolution._512}\""
-		+	$"\n- \"{URP.ShadowResolution._1024}\""
-		+	$"\n- \"{URP.ShadowResolution._2048}\""
-		+	$"\n- \"{URP.ShadowResolution._4096}\""
-
-		#if AINS
-		+	$"\n- \"{URP.ShadowResolution._8192}\""
-		#endif
+			"The resolution to render shadows at, through the Universal Rendering Pipeline."
 		);
 
 		AntialiasingMode = new(
 			"QualitySettings",
 			"AntialiasingMode",
 			AntialiasingModeDefault,
-			"Antialiasing Mode",
 
-			$"The type of antialiasing to set UniversalAdditionalCameraData instances to use."
-		+	$"\nPossible values:"
-		+	$"\n- \"{URP.AntialiasingMode.None}\""
-		+	$"\n- \"{URP.AntialiasingMode.FastApproximateAntialiasing}\""
-		+	$"\n- \"{URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing}\""
-
-		#if AINS
-		+	$"\n- \"{URP.AntialiasingMode.TemporalAntiAliasing}\""
-		#endif
+			"The type of antialiasing to set UniversalAdditionalCameraData instances to use."
 		);
 
 		SMAAQuality = new(
 			"QualitySettings",
 			"SMAAQuality",
 			URP.AntialiasingQuality.High,
-			"SMAA Quality",
 
-			$"The level of quality to use for Subpixel Morphological Anti-Aliasing."
+			"The level of quality to use for Subpixel Morphological Anti-Aliasing."
 		+	$"\nHas no effect unless AntialiasingMode is set to \"{URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing}\"."
-		+	$"\nPossible values:"
-		+	$"\n- \"{URP.AntialiasingQuality.Low}\""
-		+	$"\n- \"{URP.AntialiasingQuality.Medium}\""
-		+	$"\n- \"{URP.AntialiasingQuality.High}\""
 		);
 
 		static void RefreshSettings<Class,Value>() where Class : uObject {
@@ -207,16 +170,9 @@ static class QualityFixes {
 			"QualitySettings",
 			"TAAQuality",
 			URP.TemporalAAQuality.VeryHigh,
-			"TAA Quality",
 
-			$"The level of quality to use for Temporal Anti-Aliasing."
+			"The level of quality to use for Temporal Anti-Aliasing."
 		+	$"\nHas no effect unless AntialiasingMode is set to \"{URP.AntialiasingMode.TemporalAntiAliasing}\"."
-		+	$"\nPossible values:"
-		+	$"\n- \"{URP.TemporalAAQuality.VeryLow}\""
-		+	$"\n- \"{URP.TemporalAAQuality.Low}\""
-		+	$"\n- \"{URP.TemporalAAQuality.Medium}\""
-		+	$"\n- \"{URP.TemporalAAQuality.High}\""
-		+	$"\n- \"{URP.TemporalAAQuality.VeryHigh}\""
 		);
 
 		CustomTAASettings = new() {

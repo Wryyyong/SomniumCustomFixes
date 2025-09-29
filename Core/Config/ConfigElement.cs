@@ -3,8 +3,8 @@ namespace SomniumCustomFixes.Config;
 interface IConfigElement {
 	internal string Category { get; }
 	internal string Identifier { get; }
-	internal string ShortDescription { get; }
-	internal string LongDescription { get; }
+	internal string LongName { get; }
+	internal string Description { get; }
 
 	internal object BoxedValue { get; set; }
 	internal object DefaultValue { get; }
@@ -14,12 +14,12 @@ interface IConfigElement {
 	internal object GetLoaderConfigValue();
 }
 
-class ConfigElement<Type> : IConfigElement {
+partial class ConfigElement<Type> : IConfigElement {
 	// Explicit redirects
 	string IConfigElement.Category => Category;
 	string IConfigElement.Identifier => Identifier;
-	string IConfigElement.ShortDescription => ShortDescription;
-	string IConfigElement.LongDescription => LongDescription;
+	string IConfigElement.LongName => LongName;
+	string IConfigElement.Description => Description;
 
 	object IConfigElement.BoxedValue {
 		get => BoxedValue;
@@ -34,8 +34,8 @@ class ConfigElement<Type> : IConfigElement {
 	// Implicit members
 	internal string Category { get; init; }
 	internal string Identifier { get; init; }
-	internal string ShortDescription { get; init; }
-	internal string LongDescription { get; init; }
+	internal string LongName { get; init; }
+	internal string Description { get; init; }
 
 	Type _value;
 	internal Type Value {
@@ -84,15 +84,20 @@ class ConfigElement<Type> : IConfigElement {
 		string category,
 		string identifier,
 		Type defaultVal,
-		string shortDesc = null,
-		string longDesc = null,
+		string desc = null,
 		ConfigValidator validator = null
 	) {
 		Category = category;
 		Identifier = identifier;
-		ShortDescription = shortDesc;
-		LongDescription = longDesc;
+		Description = desc;
 		Validator = validator;
+
+	#if MELON
+		if (ConfigSets.TryGetValue(identifier,out var set)) {
+			LongName = set.LongName;
+			Description += "\n" + set.PossibleValues;
+		}
+	#endif
 
 		_value = DefaultValue = defaultVal;
 

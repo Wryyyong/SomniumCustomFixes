@@ -60,20 +60,17 @@ static class UltrawideFixes {
 		DoUltrawideFixes = new(
 			"UltrawideFixes",
 			"DoUltrawideFixes",
-			true,
-			"Fix ultrawide UI issues"
+			true
 		);
 		ResWidth = new(
 			"UltrawideFixes",
 			"CustomResolutionWidth",
-			displayMain.systemWidth,
-			"Custom resolution (width)"
+			displayMain.systemWidth
 		);
 		ResHeight = new(
 			"UltrawideFixes",
 			"CustomResolutionHeight",
-			displayMain.systemHeight,
-			"Custom resolution (height)"
+			displayMain.systemHeight
 		);
 
 		static void SetShouldBother() {
