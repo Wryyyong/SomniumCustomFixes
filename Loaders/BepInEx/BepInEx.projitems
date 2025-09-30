@@ -9,9 +9,9 @@
     <None Include="$(MSBuildThisFileDirectory)BepInEx.props" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ConfigHandlerBepis.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConfigValidatorBepis.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SomniumCoreBepis.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SomniumLoaderBepis.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConfigHandler_BEPIS.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConfigValidator_BEPIS.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SomniumCore_BEPIS.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SomniumLoader_BEPIS.cs" />
   </ItemGroup>
 </Project>

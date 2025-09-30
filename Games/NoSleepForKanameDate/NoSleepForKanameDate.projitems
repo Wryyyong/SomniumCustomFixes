@@ -9,6 +9,6 @@
     <None Include="$(MSBuildThisFileDirectory)NoSleepForKanameDate.props" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)SomniumCoreAINS.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SomniumCore_AINS.cs" />
   </ItemGroup>
 </Project>

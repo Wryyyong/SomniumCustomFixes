@@ -9,10 +9,10 @@
     <None Include="$(MSBuildThisFileDirectory)MelonLoader.props" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ConfigHandlerMelon.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConfigExclusiveStringsMelon.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConfigValidatorMelon.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SomniumCoreMelon.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SomniumLoaderMelon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConfigHandler_MELON.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConfigExclusiveStrings_MELON.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ConfigValidator_MELON.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SomniumCore_MELON.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SomniumLoader_MELON.cs" />
   </ItemGroup>
 </Project>
