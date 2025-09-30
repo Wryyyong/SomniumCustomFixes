@@ -3,23 +3,26 @@ namespace SomniumCustomFixes.Helpers;
 delegate bool CacheCondition<Class>(Class obj) where Class : uObject;
 delegate bool SetCondition<Class,Value>(Class obj,ref Value newVal) where Class : uObject;
 
-class SettingInfo {
-	internal (Type,Type) Types { get; init; }
-	internal PropertyInfo Property { get; init; }
-	internal MethodBase Setter { get; init; }
-	internal MethodBase Getter { get; init; }
+abstract class SettingInfo {
+	internal abstract (Type,Type) Types { get; }
 
-	internal bool DoAutoPatch { get; init; }
-	internal bool DoTypeDataPatch { get; init; }
-	internal bool DoLogging { get; init; }
+	internal virtual PropertyInfo Property { get; init; }
+	internal virtual MethodInfo Setter { get; init; }
+	internal virtual MethodInfo Getter { get; init; }
 
-	internal virtual bool InitializeTypeData() => false;
+	internal virtual bool DoAutoPatch { get; init; }
+	internal virtual bool DoTypeDataPatch { get; init; }
+	internal virtual bool DoLogging { get; init; }
+
+	internal abstract bool InitializeTypeData();
 }
 
 class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 	const bool Default_DoLogging = true;
 	static readonly CacheCondition<Class> Default_CacheConditional = static _ => true;
 	static readonly SetCondition<Class,Value> Default_SetConditional = static (_,ref _) => true;
+
+	internal override (Type,Type) Types => (typeof(Class),typeof(Value));
 
 	internal Value TargetValue { get; set; }
 
@@ -33,13 +36,24 @@ class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 		return doPatch;
 	}
 
-	internal SettingInfo(string name,ConfigElement<Value> element,bool doLogging = Default_DoLogging,CacheCondition<Class> cacheCondition = null,SetCondition<Class,Value> setCondition = null)
-		: this(name,element.Value,doLogging,cacheCondition,setCondition) =>
+	internal SettingInfo(
+		string propertyName,
+		ConfigElement<Value> element,
+		bool doLogging = Default_DoLogging,
+		CacheCondition<Class> cacheCondition = null,
+		SetCondition<Class,Value> setCondition = null
+	) : this(propertyName,element.Value,doLogging,cacheCondition,setCondition) =>
 			ConfigElement = element;
 
-	internal SettingInfo(string name,Value targetVal,bool doLogging = Default_DoLogging,CacheCondition<Class> cacheCondition = null,SetCondition<Class,Value> setCondition = null) {
-		var typeClass = typeof(Class);
-		var property = typeClass.GetProperty(name,AccessTools.all);
+	internal SettingInfo(
+		string propertyName,
+		Value targetVal,
+		bool doLogging = Default_DoLogging,
+		CacheCondition<Class> cacheCondition = null,
+		SetCondition<Class,Value> setCondition = null
+	) {
+		var typeClass = Types.Item1;
+		var property = typeClass.GetProperty(propertyName,AccessTools.all);
 
 		Setter = property.SetMethod;
 		Getter = property.GetMethod;
@@ -47,12 +61,11 @@ class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 		ArgumentNullException.ThrowIfNull(property);
 		ArgumentNullException.ThrowIfNull(Setter);
 
-		Types = (typeClass,typeof(Value));
 		Property = property;
 
 		TargetValue = targetVal;
 
-		DoAutoPatch = typeClass.GetField($"NativeFieldInfoPtr_{name}",AccessTools.all) is null;
+		DoAutoPatch = typeClass.GetField($"NativeFieldInfoPtr_{propertyName}",AccessTools.all) is null;
 		DoTypeDataPatch = !AccessTools.IsStatic(typeClass);
 		DoLogging = doLogging;
 
