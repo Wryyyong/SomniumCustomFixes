@@ -18,13 +18,6 @@ using SomniumCustomFixes.Helpers;
 
 namespace SomniumCustomFixes.Patches;
 
-record QualityFixPatchSet(
-	HarmonyMethod AutoPatch,
-	HarmonyMethod CacheObjects,
-	HarmonyMethod CleanCaches,
-	HarmonyMethod RemoveFromCache
-);
-
 [HarmonyPatch]
 static class QualityFixes {
 	// Stylistic preferences
