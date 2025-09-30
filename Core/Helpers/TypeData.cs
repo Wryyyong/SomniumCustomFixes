@@ -1,26 +1,33 @@
 namespace SomniumCustomFixes.Helpers;
 
-class TypeData {
+abstract class TypeData {
 	protected static readonly Dictionary<(Type,Type),TypeData> RegisteredTypes = [];
+
+	internal abstract void CleanCache();
+	internal abstract void UpdateCache();
+	internal abstract void Refresh();
+	internal abstract void FullUpdate();
 }
 
 class TypeData<Class,Value> : TypeData where Class : uObject {
 	static readonly object[] ParamList = [null];
 	static readonly List<string> LogMsgs = [];
 
-	internal Dictionary<MethodBase,SettingInfo<Class,Value>> InfoData { get; init; } = [];
-	internal Dictionary<ConfigElement<Value>,HashSet<SettingInfo<Class,Value>>> ConfigBindings { get; init; } = [];
-	internal Dictionary<Class,Dictionary<SettingInfo<Class,Value>,Value>> Cache { get; init; } = [];
+	internal static (Type,Type) Types => (typeof(Class),typeof(Value));
+
+	internal readonly Dictionary<MethodBase,SettingInfo<Class,Value>> InfoData = [];
+	internal readonly Dictionary<ConfigElement<Value>,HashSet<SettingInfo<Class,Value>>> ConfigBindings = [];
+	internal readonly Dictionary<Class,Dictionary<SettingInfo<Class,Value>,Value>> Cache = [];
 
 	internal static TypeData<Class,Value> GetTypeData() =>
-		(TypeData<Class,Value>)RegisteredTypes[(typeof(Class),typeof(Value))];
+		(TypeData<Class,Value>)RegisteredTypes[Types];
 
 	internal static bool SetCheck(Class obj,SettingInfo<Class,Value> info,Value oldVal,ref Value newVal) =>
 		info.SetCondition(obj,ref newVal)
 	&&	!newVal.Equals(oldVal)
 	;
 
-	internal void CleanCache() {
+	internal override void CleanCache() {
 		foreach (var obj in Cache.Keys) {
 			if (
 				!(
@@ -32,7 +39,7 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 		}
 	}
 
-	internal void UpdateCache() {
+	internal override void UpdateCache() {
 		foreach (var obj in Resources.FindObjectsOfTypeAll<Class>()) {
 			if (Cache.ContainsKey(obj)) continue;
 
@@ -47,7 +54,7 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 		}
 	}
 
-	internal void Refresh() {
+	internal override void Refresh() {
 		ref var paramVal = ref ParamList[0];
 
 		try {
@@ -78,6 +85,7 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 				}
 			}
 		} catch {
+			throw;
 		} finally {
 			paramVal = null;
 		}
@@ -86,14 +94,14 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 		LogMsgs.Clear();
 	}
 
-	internal void FullUpdate() {
+	internal override void FullUpdate() {
 		CleanCache();
 		UpdateCache();
 		Refresh();
 	}
 
 	internal TypeData(SettingInfo<Class,Value> info,out bool doPatch) {
-		doPatch = RegisteredTypes.TryAdd(info.Types,this);
+		doPatch = RegisteredTypes.TryAdd(Types,this);
 		var data = GetTypeData();
 
 		data.InfoData.TryAdd(info.Setter,info);
