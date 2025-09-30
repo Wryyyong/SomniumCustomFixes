@@ -194,24 +194,35 @@ static class QualityFixes {
 	#endif
 
 	#endregion
+
 	#region SettingInfo Setup
+
+		static MethodInfo GetMethod(Type type,string name,Type[] parameters = null) =>
+			parameters is null
+		?	type.GetMethod(name,AccessTools.all)
+		:	type.GetMethod(name,AccessTools.all,parameters)
+		;
 
 		var harmony = SomniumCore.HarmonyInstance;
 		var autoPatchCache = new Dictionary<(Type,Type),(Type[],HarmonyMethod)>();
 
-		// Our methods
-		var autoPatch = typeof(QualityFixes).GetMethod(nameof(AutoPatch),AccessTools.all);
+		var typeQualityFixes = typeof(QualityFixes);
+		var typeUObject = typeof(uObject);
+		var typeSceneManager = typeof(SceneManager);
 
-		var cacheObjs = typeof(QualityFixes).GetMethod(nameof(CacheObjects),AccessTools.all);
-		var cleanCaches = typeof(QualityFixes).GetMethod(nameof(CleanCaches),AccessTools.all);
-		var removeFromCache = typeof(QualityFixes).GetMethod(nameof(RemoveFromCache),AccessTools.all);
+		// Our methods
+		var autoPatch = GetMethod(typeQualityFixes,nameof(AutoPatch));
+
+		var cacheObjs = GetMethod(typeQualityFixes,nameof(CacheObjects));
+		var cleanCaches = GetMethod(typeQualityFixes,nameof(CleanCaches));
+		var removeFromCache = GetMethod(typeQualityFixes,nameof(RemoveFromCache));
 
 		// Unity methods
-		var uObjDestroy = typeof(uObject).GetMethod(nameof(uObject.Destroy),AccessTools.all,[typeof(uObject),typeof(float)]);
-		var uObjDestroyImmediate = typeof(uObject).GetMethod(nameof(uObject.DestroyImmediate),AccessTools.all,[typeof(uObject),typeof(bool)]);
+		var uObjDestroy = GetMethod(typeUObject,nameof(uObject.Destroy),[typeUObject,typeof(float)]);
+		var uObjDestroyImmediate = GetMethod(typeUObject,nameof(uObject.DestroyImmediate),[typeUObject,typeof(bool)]);
 
-		var sceneLoad = typeof(SceneManager).GetMethod(nameof(SceneManager.Internal_SceneLoaded),AccessTools.all);
-		var sceneUnload = typeof(SceneManager).GetMethod(nameof(SceneManager.Internal_SceneUnloaded),AccessTools.all);
+		var sceneLoad = GetMethod(typeSceneManager,nameof(SceneManager.Internal_SceneLoaded));
+		var sceneUnload = GetMethod(typeSceneManager,nameof(SceneManager.Internal_SceneUnloaded));
 
 		static bool TextureCheck(Texture obj) => obj.TryCast<RenderTexture>() is null;
 
