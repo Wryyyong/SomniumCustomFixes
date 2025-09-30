@@ -28,6 +28,17 @@
 		<BaseOutputPath>$(RootDir)__bin</BaseOutputPath>
 	</PropertyGroup>
 
+	<!-- Assembly attribute settings -->
+	<PropertyGroup>
+		<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+		<GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+
+		<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+
+		<GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+		<GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+	</PropertyGroup>
+
 	<!-- External assemblies -->
 	<ItemGroup>
 		<Reference Include="Assembly-CSharp">

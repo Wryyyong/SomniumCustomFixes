@@ -1,7 +1,5 @@
 using MelonLoader;
 
-using SomniumCustomFixes;
-
 [assembly: MelonInfo(typeof(SomniumLoaderMelon),SomniumCore.ModTitle,SomniumCore.ModVersion,SomniumCore.ModAuthor)]
 [assembly: MelonGame(SomniumCore.GameDeveloper,SomniumCore.GameTarget)]
 

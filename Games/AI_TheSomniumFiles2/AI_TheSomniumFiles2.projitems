@@ -8,4 +8,7 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)AI_TheSomniumFiles2.props" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)SomniumCoreAINI.cs" />
+  </ItemGroup>
 </Project>

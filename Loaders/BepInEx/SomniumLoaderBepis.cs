@@ -2,8 +2,6 @@ using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 
-using SomniumCustomFixes;
-
 namespace SomniumCustomFixes;
 
 [BepInPlugin(SomniumCore.ModReverseDNS,SomniumCore.ModTitle,SomniumCore.ModVersion)]

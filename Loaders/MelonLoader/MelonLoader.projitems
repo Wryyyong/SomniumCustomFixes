@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ConfigHandlerMelon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConfigExclusiveStringsMelon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConfigValidatorMelon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SomniumCoreMelon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SomniumLoaderMelon.cs" />
   </ItemGroup>
 </Project>

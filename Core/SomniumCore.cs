@@ -7,28 +7,33 @@ global using HarmonyLib;
 global using UnityEngine;
 global using uObject = UnityEngine.Object;
 
+global using SomniumCustomFixes;
 global using SomniumCustomFixes.Config;
 
 using System.Linq;
+using System.Runtime.Versioning;
+using UnityEngine.Rendering;
+
+[assembly: AssemblyProduct(SomniumCore.ModTitle)]
+[assembly: AssemblyTitle($"{SomniumCore.ModTitle}.{SomniumCore.GameTarget}")]
+
+[assembly: AssemblyDescription($"A {SomniumCore.LoaderTarget} mod to help with increasing the visual quality in \"{SomniumCore.GameTitle}\".")]
+
+[assembly: AssemblyCompany(SomniumCore.ModAuthor)]
+[assembly: AssemblyCopyright(SomniumCore.ModAuthor)]
+
+[assembly: AssemblyVersion(SomniumCore.ModVersion)]
+[assembly: AssemblyFileVersion(SomniumCore.ModVersion)]
 
 namespace SomniumCustomFixes;
 
-static class SomniumCore {
+static partial class SomniumCore {
 	public const string ModTitle = "SomniumCustomFixes";
 	public const string ModVersion = "1.0.0";
 	public const string ModAuthor = "Wryyyong";
 	public const string ModReverseDNS = $"org.{ModAuthor}.{ModTitle}";
 
 	public const string GameDeveloper = "SpikeChunsoft";
-	public const string GameTarget =
-	#if AITSF
-		"AI_TheSomniumFiles"
-	#elif AINI
-		"AI_TheSomniumFiles2"
-	#elif AINS
-		"NoSleepForKanameDate"
-	#endif
-	;
 
 	internal static ISomniumLoader Loader {
 		get;
