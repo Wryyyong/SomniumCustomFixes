@@ -1,7 +1,7 @@
 namespace SomniumCustomFixes.Config;
 
 abstract class ConfigHandler {
-	internal readonly Dictionary<string,IConfigElement> Elements = [];
+	internal readonly Dictionary<string,ConfigElement> Elements = [];
 
 	internal abstract void RegisterConfigElement<Type>(ConfigElement<Type> element);
 

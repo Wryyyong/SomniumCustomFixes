@@ -7,7 +7,7 @@ readonly record struct StringSet(
 	string PossibleValues = ""
 );
 
-partial class ConfigElement<Type> : IConfigElement {
+partial class ConfigElement<Type> : ConfigElement {
 	static readonly Dictionary<string,StringSet> ConfigSets = new() {
 		["LogVerbose"] = new(
 			"Verbose logging"

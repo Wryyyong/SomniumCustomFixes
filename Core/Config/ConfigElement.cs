@@ -1,56 +1,33 @@
 namespace SomniumCustomFixes.Config;
 
-interface IConfigElement {
-	internal string Category { get; }
-	internal string Identifier { get; }
-	internal string LongName { get; }
-	internal string Description { get; }
-
-	internal object BoxedValue { get; set; }
-	internal object DefaultValue { get; }
-
-	internal Action OnValueChangedNotify { get; }
-
-	internal object GetLoaderConfigValue();
-}
-
-partial class ConfigElement<Type> : IConfigElement {
-	// Explicit redirects
-	string IConfigElement.Category => Category;
-	string IConfigElement.Identifier => Identifier;
-	string IConfigElement.LongName => LongName;
-	string IConfigElement.Description => Description;
-
-	object IConfigElement.BoxedValue {
-		get => BoxedValue;
-		set => BoxedValue = value;
-	}
-	object IConfigElement.DefaultValue => DefaultValue;
-
-	Action IConfigElement.OnValueChangedNotify => OnValueChangedNotify;
-
-	object IConfigElement.GetLoaderConfigValue() => GetLoaderConfigValue();
-
-	// Implicit members
+abstract class ConfigElement {
 	internal string Category { get; init; }
 	internal string Identifier { get; init; }
 	internal string LongName { get; init; }
 	internal string Description { get; init; }
 
+	internal abstract object BoxedValue { get; set; }
+
+	internal ConfigValidator Validator { get; init; }
+
+	internal Action OnValueChangedNotify;
+
+	internal abstract object GetLoaderConfigValue();
+}
+
+partial class ConfigElement<Type> : ConfigElement {
 	Type _value;
 	internal Type Value {
 		get => _value;
 		set => SetValue(value);
 	}
-	internal object BoxedValue {
+	internal override object BoxedValue {
 		get => _value;
 		set => SetValue((Type)value);
 	}
 	internal Type DefaultValue { get; init; }
-	internal ConfigValidator Validator { get; init; }
 
-	internal Action<Type> OnValueChanged { get; set; }
-	internal Action OnValueChangedNotify { get; set; }
+	internal Action<Type> OnValueChanged;
 
 	void SetValue(Type value) {
 		if (
@@ -78,7 +55,7 @@ partial class ConfigElement<Type> : IConfigElement {
 		handler.OnAnyConfigChanged();
 	}
 
-	internal Type GetLoaderConfigValue() => SomniumCore.ConfigHandler.GetConfigValue(this);
+	internal override object GetLoaderConfigValue() => SomniumCore.ConfigHandler.GetConfigValue(this);
 
 	internal ConfigElement(
 		string category,
