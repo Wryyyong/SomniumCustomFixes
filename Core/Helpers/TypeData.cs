@@ -1,7 +1,7 @@
 namespace SomniumCustomFixes.Helpers;
 
 abstract class TypeData {
-	protected static readonly Dictionary<(Type,Type),TypeData> RegisteredTypes = [];
+	protected static readonly Dictionary<(Type Class,Type Value),TypeData> RegisteredTypes = [];
 
 	internal abstract void CleanCache();
 	internal abstract void UpdateCache();
@@ -13,7 +13,7 @@ class TypeData<Class,Value> : TypeData where Class : uObject {
 	static readonly object[] ParamList = [null];
 	static readonly List<string> LogMsgs = [];
 
-	internal static (Type,Type) Types => (typeof(Class),typeof(Value));
+	internal static (Type Class,Type Value) Types => (typeof(Class),typeof(Value));
 
 	internal readonly Dictionary<MethodBase,SettingInfo<Class,Value>> InfoData = [];
 	internal readonly Dictionary<ConfigElement<Value>,HashSet<SettingInfo<Class,Value>>> ConfigBindings = [];

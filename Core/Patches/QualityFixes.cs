@@ -197,7 +197,7 @@ static class QualityFixes {
 		;
 
 		var harmony = SomniumCore.HarmonyInstance;
-		var autoPatchCache = new Dictionary<(Type,Type),(Type[],HarmonyMethod)>();
+		var autoPatchCache = new Dictionary<(Type Class,Type Value),(Type[] TypeArray,HarmonyMethod AutoPatch)>();
 
 		var typeQualityFixes = typeof(QualityFixes);
 		var typeUObject = typeof(uObject);
@@ -386,18 +386,18 @@ static class QualityFixes {
 			var types = info.Types;
 
 			if (!autoPatchCache.TryGetValue(types,out var cache)) {
-				Type[] newArray = [types.Item1,types.Item2];
+				Type[] newArray = [types.Class,types.Value];
 				cache = (newArray,new HarmonyMethod(autoPatch.MakeGenericMethod(newArray)));
 
 				autoPatchCache.Add(types,cache);
 			}
 
-			var typeArray = cache.Item1;
+			var typeArray = cache.TypeArray;
 
 			if (info.DoAutoPatch)
 				harmony.Patch(
 					info.Setter,
-					prefix: cache.Item2
+					prefix: cache.AutoPatch
 				);
 
 			if (
