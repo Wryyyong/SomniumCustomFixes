@@ -17,12 +17,13 @@ abstract class SettingInfo {
 	internal abstract bool InitializeTypeData();
 }
 
-class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
+sealed class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 	const bool Default_DoLogging = true;
 	static readonly CacheCondition<Class> Default_CacheConditional = static _ => true;
 	static readonly SetCondition<Class,Value> Default_SetConditional = static (_,ref _) => true;
 
-	internal override (Type Class,Type Value) Types => (typeof(Class),typeof(Value));
+	static readonly (Type Class,Type Value) _types = (typeof(Class),typeof(Value));
+	internal override (Type Class,Type Value) Types => _types;
 
 	internal Value TargetValue { get; set; }
 

@@ -9,11 +9,11 @@ abstract class TypeData {
 	internal abstract void FullUpdate();
 }
 
-class TypeData<Class,Value> : TypeData where Class : uObject {
+sealed class TypeData<Class,Value> : TypeData where Class : uObject {
 	static readonly object[] ParamList = [null];
 	static readonly List<string> LogMsgs = [];
 
-	internal static (Type Class,Type Value) Types => (typeof(Class),typeof(Value));
+	internal static (Type Class,Type Value) Types { get; } = (typeof(Class),typeof(Value));
 
 	internal readonly Dictionary<MethodBase,SettingInfo<Class,Value>> InfoData = [];
 	internal readonly Dictionary<ConfigElement<Value>,HashSet<SettingInfo<Class,Value>>> ConfigBindings = [];

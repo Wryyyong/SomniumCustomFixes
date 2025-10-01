@@ -10,12 +10,12 @@ abstract class ConfigElement {
 
 	internal ConfigValidator Validator { get; init; }
 
-	internal Action OnValueChangedNotify;
+	internal Action OnValueChangedNotify { get; set; }
 
 	internal abstract object GetLoaderConfigValue();
 }
 
-partial class ConfigElement<Type> : ConfigElement {
+sealed partial class ConfigElement<Type> : ConfigElement {
 	Type _value;
 	internal Type Value {
 		get => _value;
@@ -27,7 +27,7 @@ partial class ConfigElement<Type> : ConfigElement {
 	}
 	internal Type DefaultValue { get; init; }
 
-	internal Action<Type> OnValueChanged;
+	internal Action<Type> OnValueChanged { get; set; }
 
 	void SetValue(Type value) {
 		if (
