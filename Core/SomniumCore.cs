@@ -8,22 +8,23 @@ global using UnityEngine;
 global using uObject = UnityEngine.Object;
 
 global using SomniumCustomFixes;
+global using static SomniumCustomFixes.SomniumCore;
 global using SomniumCustomFixes.Config;
 
 using System.Linq;
 using System.Runtime.Versioning;
 using UnityEngine.Rendering;
 
-[assembly: AssemblyProduct(SomniumCore.ModTitle)]
-[assembly: AssemblyTitle($"{SomniumCore.ModTitle}.{SomniumCore.GameTarget}")]
+[assembly: AssemblyProduct(ModTitle)]
+[assembly: AssemblyTitle($"{ModTitle}.{GameTarget}")]
 
-[assembly: AssemblyDescription($"A {SomniumCore.LoaderTarget} mod to help with increasing the visual quality in \"{SomniumCore.GameTitle}\".")]
+[assembly: AssemblyDescription($"A {LoaderTarget} mod to help with increasing the visual quality in \"{GameTitle}\".")]
 
-[assembly: AssemblyCompany(SomniumCore.ModAuthor)]
-[assembly: AssemblyCopyright(SomniumCore.ModAuthor)]
+[assembly: AssemblyCompany(ModAuthor)]
+[assembly: AssemblyCopyright(ModAuthor)]
 
-[assembly: AssemblyVersion(SomniumCore.ModVersion)]
-[assembly: AssemblyFileVersion(SomniumCore.ModVersion)]
+[assembly: AssemblyVersion(ModVersion)]
+[assembly: AssemblyFileVersion(ModVersion)]
 
 namespace SomniumCustomFixes;
 
@@ -41,12 +42,12 @@ static partial class SomniumCore {
 			field = value;
 
 			HarmonyInstance = value.HarmonyInstance;
-			ConfigHandler = value.ConfigHandler;
+			ConfHandler = value.ConfHandler;
 		}
 	}
 
 	internal static HarmonyLib.Harmony HarmonyInstance;
-	internal static ConfigHandler ConfigHandler;
+	internal static ConfigHandler ConfHandler;
 
 	static ConfigElement<bool> LogVerbose;
 
@@ -76,7 +77,7 @@ static partial class SomniumCore {
 			.Select(static type => type.GetMethod("PatchInit",AccessTools.all))
 			.ToList().ForEach(static method => method?.Invoke(null,null));
 
-		ConfigHandler.LoadConfig();
-		ConfigHandler.SaveConfig();
+		ConfHandler.LoadConfig();
+		ConfHandler.SaveConfig();
 	}
 }

@@ -194,7 +194,6 @@ static class QualityFixes {
 		:	type.GetMethod(name,AccessTools.all,parameters)
 		;
 
-		var harmony = SomniumCore.HarmonyInstance;
 		var autoPatchCache = new Dictionary<(Type Class,Type Value),(Type[] TypeArray,HarmonyMethod AutoPatch)>();
 
 		var typeQualityFixes = typeof(QualityFixes);
@@ -380,7 +379,6 @@ static class QualityFixes {
 		#endif
 		],info => {
 			var newTypeData = info.InitializeTypeData();
-
 			var types = info.Types;
 
 			if (!autoPatchCache.TryGetValue(types,out var cache)) {
@@ -393,7 +391,7 @@ static class QualityFixes {
 			var typeArray = cache.TypeArray;
 
 			if (info.DoAutoPatch)
-				harmony.Patch(
+				HarmonyInstance.Patch(
 					info.Setter,
 					prefix: cache.AutoPatch
 				);
@@ -404,20 +402,20 @@ static class QualityFixes {
 			) {
 				var removeFromCachePatch = new HarmonyMethod(removeFromCache.MakeGenericMethod(typeArray));
 
-				harmony.Patch(
+				HarmonyInstance.Patch(
 					uObjDestroy,
 					prefix: removeFromCachePatch
 				);
-				harmony.Patch(
+				HarmonyInstance.Patch(
 					uObjDestroyImmediate,
 					prefix: removeFromCachePatch
 				);
 
-				harmony.Patch(
+				HarmonyInstance.Patch(
 					sceneLoad,
 					postfix: new HarmonyMethod(cacheObjs.MakeGenericMethod(typeArray))
 				);
-				harmony.Patch(
+				HarmonyInstance.Patch(
 					sceneUnload,
 					postfix: new HarmonyMethod(cleanCaches.MakeGenericMethod(typeArray))
 				);
@@ -445,7 +443,7 @@ static class QualityFixes {
 		var instNull = __instance is null;
 
 		if (info.DoLogging)
-			SomniumCore.EasyLog(
+			EasyLog(
 				(instNull ? __originalMethod.DeclaringType.ToString() : __instance.name)
 			+	$" :: {__originalMethod.Name} | {__0} -> {newVal}"
 			);

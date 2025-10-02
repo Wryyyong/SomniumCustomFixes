@@ -1,7 +1,7 @@
 using MelonLoader;
 
-[assembly: MelonInfo(typeof(SomniumLoaderMelon),SomniumCore.ModTitle,SomniumCore.ModVersion,SomniumCore.ModAuthor)]
-[assembly: MelonGame(SomniumCore.GameDeveloper,SomniumCore.GameTarget)]
+[assembly: MelonInfo(typeof(SomniumLoaderMelon),ModTitle,ModVersion,ModAuthor)]
+[assembly: MelonGame(GameDeveloper,GameTarget)]
 
 [assembly: VerifyLoaderVersion(0,6,0,true)]
 [assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.IL2CPP)]
@@ -13,8 +13,8 @@ namespace SomniumCustomFixes;
 
 sealed class SomniumLoaderMelon : MelonMod,ISomniumLoader {
 	HarmonyLib.Harmony ISomniumLoader.HarmonyInstance => HarmonyInstance;
-	ConfigHandler ISomniumLoader.ConfigHandler => new ConfigHandlerMelon();
+	ConfigHandler ISomniumLoader.ConfHandler => new ConfigHandlerMelon();
 	Action<string> ISomniumLoader.LogMsg => LoggerInstance.Msg;
 
-	public override void OnInitializeMelon() => SomniumCore.Init(this);
+	public override void OnInitializeMelon() => Init(this);
 }

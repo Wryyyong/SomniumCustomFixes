@@ -9,7 +9,7 @@ sealed class ConfigHandlerMelon : ConfigHandler {
 	static MelonPreferences_Category GetCategory(string name) {
 		if (!Categories.TryGetValue(name,out var category)) {
 			category = MelonPreferences.CreateCategory(name);
-			category.SetFilePath($"UserData/{SomniumCore.ModTitle}.ini",true,false);
+			category.SetFilePath($"UserData/{ModTitle}.ini",true,false);
 
 			Categories.Add(name,category);
 		}

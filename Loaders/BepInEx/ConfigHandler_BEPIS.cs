@@ -4,7 +4,7 @@ using BepInEx.Unity.IL2CPP;
 namespace SomniumCustomFixes.Config;
 
 sealed class ConfigHandlerBepis : ConfigHandler {
-	readonly ConfigFile Config = (SomniumCore.Loader as BasePlugin).Config;
+	readonly ConfigFile Config = (Loader as BasePlugin).Config;
 
 	internal override void RegisterConfigElement<Type>(ConfigElement<Type> element) {
 		var identifier = element.Identifier;

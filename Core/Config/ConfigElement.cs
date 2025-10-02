@@ -41,21 +41,19 @@ sealed partial class ConfigElement<Type> : ConfigElement {
 		)
 		) return;
 
-		var handler = SomniumCore.ConfigHandler;
-
 		if (Validator is not null)
 			value = (Type)Validator.EnsureValid(value);
 
 		_value = value;
-		handler.SetConfigValue(this,value);
+		ConfHandler.SetConfigValue(this,value);
 
 		OnValueChanged?.Invoke(value);
 		OnValueChangedNotify?.Invoke();
 
-		handler.OnAnyConfigChanged();
+		ConfHandler.OnAnyConfigChanged();
 	}
 
-	internal override object GetLoaderConfigValue() => SomniumCore.ConfigHandler.GetConfigValue(this);
+	internal override object GetLoaderConfigValue() => ConfHandler.GetConfigValue(this);
 
 	internal ConfigElement(
 		string category,
@@ -78,6 +76,6 @@ sealed partial class ConfigElement<Type> : ConfigElement {
 
 		_value = DefaultValue = defaultVal;
 
-		SomniumCore.ConfigHandler.RegisterConfigElement(this);
+		ConfHandler.RegisterConfigElement(this);
 	}
 }
