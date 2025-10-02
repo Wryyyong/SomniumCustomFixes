@@ -1,33 +1,21 @@
 namespace SomniumCustomFixes.Helpers;
 
-abstract class TypeData {
-	protected static readonly Dictionary<(Type Class,Type Value),TypeData> RegisteredTypes = [];
+static class TypeData<Class,Value> where Class : uObject {
+	static readonly HashSet<(Type,Type)> RegisteredTypes = [];
 
-	internal abstract void CleanCache();
-	internal abstract void UpdateCache();
-	internal abstract void Refresh();
-	internal abstract void FullUpdate();
-}
-
-sealed class TypeData<Class,Value> : TypeData where Class : uObject {
 	static readonly object[] ParamList = [null];
 	static readonly List<string> LogMsgs = [];
 
-	internal static (Type Class,Type Value) Types { get; } = (typeof(Class),typeof(Value));
-
-	internal readonly Dictionary<MethodBase,SettingInfo<Class,Value>> InfoData = [];
-	internal readonly Dictionary<ConfigElement<Value>,HashSet<SettingInfo<Class,Value>>> ConfigBindings = [];
-	internal readonly Dictionary<Class,Dictionary<SettingInfo<Class,Value>,Value>> Cache = [];
-
-	internal static TypeData<Class,Value> GetTypeData() =>
-		(TypeData<Class,Value>)RegisteredTypes[Types];
+	internal static readonly Dictionary<MethodInfo,SettingInfo<Class,Value>> InfoData = [];
+	internal static readonly Dictionary<ConfigElement<Value>,HashSet<SettingInfo<Class,Value>>> ConfigBindings = [];
+	internal static readonly Dictionary<Class,Dictionary<SettingInfo<Class,Value>,Value>> Cache = [];
 
 	internal static bool SetCheck(Class obj,SettingInfo<Class,Value> info,Value oldVal,ref Value newVal) =>
 		info.SetCondition(obj,ref newVal)
 	&&	!newVal.Equals(oldVal)
 	;
 
-	internal override void CleanCache() {
+	internal static void CleanCache() {
 		foreach (var obj in Cache.Keys) {
 			if (
 				!(
@@ -39,7 +27,7 @@ sealed class TypeData<Class,Value> : TypeData where Class : uObject {
 		}
 	}
 
-	internal override void UpdateCache() {
+	internal static void UpdateCache() {
 		foreach (var obj in Resources.FindObjectsOfTypeAll<Class>()) {
 			if (Cache.ContainsKey(obj)) continue;
 
@@ -54,7 +42,7 @@ sealed class TypeData<Class,Value> : TypeData where Class : uObject {
 		}
 	}
 
-	internal override void Refresh() {
+	internal static void Refresh() {
 		ref var paramVal = ref ParamList[0];
 
 		try {
@@ -74,9 +62,7 @@ sealed class TypeData<Class,Value> : TypeData where Class : uObject {
 
 						if (!SetCheck(obj,info,oldVal,ref newVal)) continue;
 
-						if (info.DoLogging)
-							LogMsgs.Add($"{obj.name} :: {setter.Name} | {oldVal} -> {newVal}");
-
+						LogMsgs.Add($"{obj.name} :: {setter.Name} | {oldVal} -> {newVal}");
 						oldValList[info] = oldVal;
 					}
 
@@ -88,33 +74,30 @@ sealed class TypeData<Class,Value> : TypeData where Class : uObject {
 			throw;
 		} finally {
 			paramVal = null;
-		}
 
-		SomniumCore.EasyLog([.. LogMsgs]);
-		LogMsgs.Clear();
+			EasyLog([.. LogMsgs]);
+			LogMsgs.Clear();
+		}
 	}
 
-	internal override void FullUpdate() {
+	internal static void FullUpdate() {
 		CleanCache();
 		UpdateCache();
 		Refresh();
 	}
 
-	internal TypeData(SettingInfo<Class,Value> info,out bool doPatch) {
-		doPatch = RegisteredTypes.TryAdd(Types,this);
-		var data = GetTypeData();
+	internal static void SetupInfo(SettingInfo<Class,Value> info,out bool doPatch) {
+		doPatch = RegisteredTypes.Add(info.Types);
 
-		data.InfoData.TryAdd(info.Setter,info);
+		InfoData.TryAdd(info.Setter,info);
 
 		var element = info.ConfigElement;
 
 		if (element is null) return;
 
-		var bindings = data.ConfigBindings;
-
-		if (!bindings.TryGetValue(element,out var confInfos)) {
+		if (!ConfigBindings.TryGetValue(element,out var confInfos)) {
 			confInfos = [];
-			bindings.TryAdd(element,confInfos);
+			ConfigBindings.TryAdd(element,confInfos);
 		}
 
 		confInfos.Add(info);

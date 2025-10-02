@@ -32,7 +32,7 @@ sealed class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 	internal SetCondition<Class,Value> SetCondition { get; init; }
 
 	internal override bool InitializeTypeData() {
-		_ = new TypeData<Class,Value>(this,out var doPatch);
+		TypeData<Class,Value>.SetupInfo(this,out var doPatch);
 
 		return doPatch;
 	}

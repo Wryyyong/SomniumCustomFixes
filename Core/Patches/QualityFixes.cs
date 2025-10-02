@@ -123,16 +123,14 @@ static class QualityFixes {
 		);
 
 		static void RefreshSettings<Class,Value>() where Class : uObject {
-			var data = TypeData<Class,Value>.GetTypeData();
-
-			foreach (var binding in data.ConfigBindings) {
+			foreach (var binding in TypeData<Class,Value>.ConfigBindings) {
 				var newVal = binding.Key.Value;
 
 				foreach (var info in binding.Value)
 					info.TargetValue = newVal;
 			}
 
-			data.Refresh();
+			TypeData<Class,Value>.Refresh();
 		}
 
 		static void RefreshAniso() {
@@ -430,17 +428,16 @@ static class QualityFixes {
 	}
 
 	static void RemoveFromCache<Class,Value>(Class __0) where Class : uObject =>
-		TypeData<Class,Value>.GetTypeData().Cache.Remove(__0);
+		TypeData<Class,Value>.Cache.Remove(__0);
 
 	static void CacheObjects<Class,Value>() where Class : uObject =>
-		TypeData<Class,Value>.GetTypeData().FullUpdate();
+		TypeData<Class,Value>.FullUpdate();
 
 	static void CleanCaches<Class,Value>() where Class : uObject =>
-		TypeData<Class,Value>.GetTypeData().CleanCache();
+		TypeData<Class,Value>.CleanCache();
 
-	static void AutoPatch<Class,Value>(MethodBase __originalMethod,Class __instance,ref Value __0) where Class : uObject {
-		var data = TypeData<Class,Value>.GetTypeData();
-		var info = data.InfoData[__originalMethod];
+	static void AutoPatch<Class,Value>(MethodInfo __originalMethod,Class __instance,ref Value __0) where Class : uObject {
+		var info = TypeData<Class,Value>.InfoData[__originalMethod];
 		var newVal = info.TargetValue;
 
 		if (!TypeData<Class,Value>.SetCheck(__instance,info,__0,ref newVal)) return;
@@ -454,7 +451,7 @@ static class QualityFixes {
 			);
 
 		if (!instNull) {
-			var cache = data.Cache;
+			var cache = TypeData<Class,Value>.Cache;
 
 			if (!cache.TryGetValue(__instance,out var oldValList)) {
 				oldValList = [];
