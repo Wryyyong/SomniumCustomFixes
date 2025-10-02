@@ -1,7 +1,7 @@
 namespace SomniumCustomFixes.Helpers;
 
 static class TypeData<Class,Value> where Class : uObject {
-	static readonly HashSet<(Type,Type)> RegisteredTypes = [];
+	static readonly HashSet<TypePair> RegisteredTypes = [];
 
 	static readonly object[] ParamList = [null];
 	static readonly List<string> LogMsgs = [];

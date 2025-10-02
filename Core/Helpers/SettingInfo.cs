@@ -4,7 +4,7 @@ delegate bool CacheCondition<Class>(Class obj) where Class : uObject;
 delegate bool SetCondition<Class,Value>(Class obj,ref Value newVal) where Class : uObject;
 
 abstract class SettingInfo {
-	internal abstract (Type Class,Type Value) Types { get; }
+	internal abstract TypePair Types { get; }
 
 	internal PropertyInfo Property { get; init; }
 	internal MethodInfo Setter { get; init; }
@@ -22,8 +22,8 @@ sealed class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 	static readonly CacheCondition<Class> Default_CacheConditional = static _ => true;
 	static readonly SetCondition<Class,Value> Default_SetConditional = static (_,ref _) => true;
 
-	static readonly (Type Class,Type Value) _types = (typeof(Class),typeof(Value));
-	internal override (Type Class,Type Value) Types => _types;
+	static readonly TypePair _types = new(typeof(Class),typeof(Value));
+	internal override TypePair Types => _types;
 
 	internal Value TargetValue { get; set; }
 

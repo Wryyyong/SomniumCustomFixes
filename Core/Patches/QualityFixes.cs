@@ -194,7 +194,7 @@ static class QualityFixes {
 		:	type.GetMethod(name,AccessTools.all,parameters)
 		;
 
-		var autoPatchCache = new Dictionary<(Type Class,Type Value),(Type[] TypeArray,HarmonyMethod AutoPatch)>();
+		var autoPatchCache = new Dictionary<TypePair,(Type[] TypeArray,HarmonyMethod AutoPatch)>();
 
 		var typeQualityFixes = typeof(QualityFixes);
 		var typeUObject = typeof(uObject);
@@ -383,7 +383,7 @@ static class QualityFixes {
 
 			if (!autoPatchCache.TryGetValue(types,out var cache)) {
 				Type[] newArray = [types.Class,types.Value];
-				cache = (newArray,new HarmonyMethod(autoPatch.MakeGenericMethod(newArray)));
+				cache = (newArray,new(autoPatch.MakeGenericMethod(newArray)));
 
 				autoPatchCache.Add(types,cache);
 			}
@@ -413,11 +413,11 @@ static class QualityFixes {
 
 				HarmonyInstance.Patch(
 					sceneLoad,
-					postfix: new HarmonyMethod(cacheObjs.MakeGenericMethod(typeArray))
+					postfix: new(cacheObjs.MakeGenericMethod(typeArray))
 				);
 				HarmonyInstance.Patch(
 					sceneUnload,
-					postfix: new HarmonyMethod(cleanCaches.MakeGenericMethod(typeArray))
+					postfix: new(cleanCaches.MakeGenericMethod(typeArray))
 				);
 			}
 		});
