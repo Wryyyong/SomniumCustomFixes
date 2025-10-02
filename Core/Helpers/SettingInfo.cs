@@ -6,19 +6,19 @@ delegate bool SetCondition<Class,Value>(Class obj,ref Value newVal) where Class 
 abstract class SettingInfo {
 	internal abstract (Type Class,Type Value) Types { get; }
 
-	internal virtual PropertyInfo Property { get; init; }
-	internal virtual MethodInfo Setter { get; init; }
-	internal virtual MethodInfo Getter { get; init; }
+	internal PropertyInfo Property { get; init; }
+	internal MethodInfo Setter { get; init; }
+	internal MethodInfo Getter { get; init; }
 
-	internal virtual bool DoAutoPatch { get; init; }
-	internal virtual bool DoTypeDataPatch { get; init; }
-	internal virtual bool DoLogging { get; init; }
+	internal bool DoTypeDataPatch { get; init; }
+	internal bool DoAutoPatch { get; init; }
+	internal bool DoAutoPatchLogging { get; init; }
 
 	internal abstract bool InitializeTypeData();
 }
 
 sealed class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
-	const bool Default_DoLogging = true;
+	const bool Default_DoAutoPatchLogging = true;
 	static readonly CacheCondition<Class> Default_CacheConditional = static _ => true;
 	static readonly SetCondition<Class,Value> Default_SetConditional = static (_,ref _) => true;
 
@@ -40,16 +40,16 @@ sealed class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 	internal SettingInfo(
 		string propertyName,
 		ConfigElement<Value> element,
-		bool doLogging = Default_DoLogging,
+		bool doAutoPatchLogging = Default_DoAutoPatchLogging,
 		CacheCondition<Class> cacheCondition = null,
 		SetCondition<Class,Value> setCondition = null
-	) : this(propertyName,element.Value,doLogging,cacheCondition,setCondition) =>
+	) : this(propertyName,element.Value,doAutoPatchLogging,cacheCondition,setCondition) =>
 			ConfigElement = element;
 
 	internal SettingInfo(
 		string propertyName,
 		Value targetVal,
-		bool doLogging = Default_DoLogging,
+		bool doAutoPatchLogging = Default_DoAutoPatchLogging,
 		CacheCondition<Class> cacheCondition = null,
 		SetCondition<Class,Value> setCondition = null
 	) {
@@ -66,9 +66,9 @@ sealed class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 
 		TargetValue = targetVal;
 
-		DoAutoPatch = typeClass.GetField($"NativeFieldInfoPtr_{propertyName}",AccessTools.all) is null;
 		DoTypeDataPatch = !AccessTools.IsStatic(typeClass);
-		DoLogging = doLogging;
+		DoAutoPatch = typeClass.GetField($"NativeFieldInfoPtr_{propertyName}",AccessTools.all) is null;
+		DoAutoPatchLogging = doAutoPatchLogging;
 
 		CacheCondition = cacheCondition ?? Default_CacheConditional;
 		SetCondition = setCondition ?? Default_SetConditional;

@@ -442,7 +442,7 @@ static class QualityFixes {
 
 		var instNull = __instance is null;
 
-		if (info.DoLogging)
+		if (info.DoAutoPatchLogging)
 			EasyLog(
 				(instNull ? __originalMethod.DeclaringType.ToString() : __instance.name)
 			+	$" :: {__originalMethod.Name} | {__0} -> {newVal}"
