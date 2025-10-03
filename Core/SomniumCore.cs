@@ -7,13 +7,10 @@ global using HarmonyLib;
 global using UnityEngine;
 global using uObject = UnityEngine.Object;
 
-global using SomniumCustomFixes;
 global using static SomniumCustomFixes.SomniumCore;
 global using SomniumCustomFixes.Config;
 
 using System.Linq;
-using System.Runtime.Versioning;
-using UnityEngine.Rendering;
 
 [assembly: AssemblyProduct(ModTitle)]
 [assembly: AssemblyTitle($"{ModTitle}.{GameTarget}")]
