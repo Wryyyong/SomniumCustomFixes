@@ -9,13 +9,15 @@
     <Compile Include="$(MSBuildThisFileDirectory)Config\ConfigElement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Config\ConfigHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Config\ConfigValidator.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DotNet6Compat\CompilerFeatureRequiredAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DotNet6Compat\NullableAttribute.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DotNet6Compat\RequiredMemberAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\SettingInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TypeData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TypePair.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Patches\DisableMouseCursor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Patches\QualityFixes.cs" />
     <None Include="$(MSBuildThisFileDirectory)Patches\UltrawideFixes.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)FixNullableAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ISomniumLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SomniumCore.cs" />
   </ItemGroup>
