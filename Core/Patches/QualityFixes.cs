@@ -219,7 +219,8 @@ static class QualityFixes {
 		static bool ModelOutlineCheck(URP.ScriptableRendererFeature obj) =>
 			obj.name is
 				"CharaOutLine"
-			or	"CharaOutLineMirror";
+			or	"CharaOutLineMirror"
+		;
 
 		Array.ForEach<SettingInfo>([
 			new SettingInfo<Light,LightRenderMode>(
