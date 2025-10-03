@@ -1,35 +1,29 @@
 namespace SomniumCustomFixes.Config;
 
-abstract class ConfigValidator(Type type) {
-	protected abstract object CreateLoaderValidator();
-	internal abstract object EnsureValid(object value);
+abstract class ConfigValidator<Type> {
+	protected abstract object CreateLoaderValidator(Type[] parameters);
+	internal abstract Type EnsureValid(Type value);
 
-	internal Type Type { get; init; } = type;
 	internal object LoaderValidator { get; init; }
+
+	protected ConfigValidator(Type[] parameters) =>
+		LoaderValidator = CreateLoaderValidator(parameters);
 }
 
-partial class ConfigRange<Type> : ConfigValidator where Type : IComparable {
-	internal Type ValueMin { get; init; }
-	internal Type ValueMax { get; init; }
+partial class ConfigRange<Type> : ConfigValidator<Type> where Type : IComparable {
+	protected Type ValueMin { get; init; }
+	protected Type ValueMax { get; init; }
 
-	internal override object EnsureValid(object value) =>
+	internal override Type EnsureValid(Type value) =>
 		ValueMax.CompareTo(value) < 0 ?	ValueMax
 	:	ValueMin.CompareTo(value) > 0 ?	ValueMin
 	:	value
 	;
 
 	internal ConfigRange(Type valueMin,Type valueMax)
-		: base(typeof(Type))
+		: base([valueMin,valueMax])
 	{
-		ArgumentNullException.ThrowIfNull(valueMin);
-		ArgumentNullException.ThrowIfNull(valueMax);
-
-		if (valueMin.CompareTo(valueMax) >= 0)
-			throw new ArgumentException($"Min value ({valueMin}) must be less than max value ({valueMax})");
-
 		ValueMin = valueMin;
 		ValueMax = valueMax;
-
-		LoaderValidator = CreateLoaderValidator();
 	}
 }

@@ -8,8 +8,6 @@ abstract class ConfigElement {
 
 	internal abstract object BoxedValue { get; set; }
 
-	internal ConfigValidator Validator { get; init; }
-
 	internal Action OnValueChangedNotify { get; set; }
 
 	internal abstract object GetLoaderConfigValue();
@@ -26,6 +24,8 @@ sealed partial class ConfigElement<Type> : ConfigElement {
 		set => SetValue((Type)value);
 	}
 	internal Type DefaultValue { get; init; }
+
+	internal ConfigValidator<Type> Validator { get; init; }
 
 	internal Action<Type> OnValueChanged { get; set; }
 
@@ -60,7 +60,7 @@ sealed partial class ConfigElement<Type> : ConfigElement {
 		string identifier,
 		Type defaultVal,
 		string desc = null,
-		ConfigValidator validator = null
+		ConfigValidator<Type> validator = null
 	) {
 		Category = category;
 		Identifier = identifier;
