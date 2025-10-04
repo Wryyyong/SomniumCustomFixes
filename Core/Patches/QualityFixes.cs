@@ -441,24 +441,11 @@ static class QualityFixes {
 
 		if (!TypeData<Class,Value>.SetCheck(__instance,info,__0,ref newVal)) return;
 
-		var instNull = __instance is null;
-
 		if (info.DoAutoPatchLogging)
 			EasyLog(
-				(instNull ? __originalMethod.DeclaringType.ToString() : __instance.name)
+				(__instance is null ? __originalMethod.DeclaringType.ToString() : __instance.name)
 			+	$" :: {__originalMethod.Name} | {__0} -> {newVal}"
 			);
-
-		if (!instNull) {
-			var cache = TypeData<Class,Value>.Cache;
-
-			if (!cache.TryGetValue(__instance,out var oldValList)) {
-				oldValList = [];
-				cache[__instance] = oldValList;
-			}
-
-			oldValList[info] = __0;
-		}
 
 		__0 = newVal;
 	}

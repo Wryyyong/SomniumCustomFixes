@@ -8,7 +8,7 @@ static class TypeData<Class,Value> where Class : uObject {
 
 	internal static readonly Dictionary<MethodInfo,SettingInfo<Class,Value>> InfoData = [];
 	internal static readonly Dictionary<ConfigElement<Value>,HashSet<SettingInfo<Class,Value>>> ConfigBindings = [];
-	internal static readonly Dictionary<Class,Dictionary<SettingInfo<Class,Value>,Value>> Cache = [];
+	internal static readonly HashSet<Class> Cache = [];
 
 	internal static bool SetCheck(Class obj,SettingInfo<Class,Value> info,Value oldVal,ref Value newVal) =>
 		info.SetCondition(obj,ref newVal)
@@ -16,7 +16,7 @@ static class TypeData<Class,Value> where Class : uObject {
 	;
 
 	internal static void CleanCache() {
-		foreach (var obj in Cache.Keys) {
+		foreach (var obj in Cache) {
 			if (
 				!(
 					obj is null
@@ -29,7 +29,7 @@ static class TypeData<Class,Value> where Class : uObject {
 
 	internal static void UpdateCache() {
 		foreach (var obj in Resources.FindObjectsOfTypeAll<Class>()) {
-			if (Cache.ContainsKey(obj)) continue;
+			if (Cache.Contains(obj)) continue;
 
 			foreach (var info in InfoData.Values)
 				if (info.CacheCondition(obj))
@@ -38,7 +38,7 @@ static class TypeData<Class,Value> where Class : uObject {
 			continue;
 
 		Add:
-			Cache.Add(obj,[]);
+			Cache.Add(obj);
 		}
 	}
 
@@ -46,10 +46,7 @@ static class TypeData<Class,Value> where Class : uObject {
 		ref var paramVal = ref ParamList[0];
 
 		try {
-			foreach (var set in Cache) {
-				var obj = set.Key;
-				var oldValList = set.Value;
-
+			foreach (var obj in Cache) {
 				foreach (var info in InfoData.Values) {
 					var setter = info.Setter;
 					var oldVal = (Value)info.Getter?.Invoke(obj,null);
@@ -63,7 +60,6 @@ static class TypeData<Class,Value> where Class : uObject {
 						if (!SetCheck(obj,info,oldVal,ref newVal)) continue;
 
 						LogMsgs.Add($"{obj.name} :: {setter.Name} | {oldVal} -> {newVal}");
-						oldValList[info] = oldVal;
 					}
 
 					paramVal = newVal;
@@ -97,7 +93,7 @@ static class TypeData<Class,Value> where Class : uObject {
 
 		if (!ConfigBindings.TryGetValue(element,out var confInfos)) {
 			confInfos = [];
-			ConfigBindings.TryAdd(element,confInfos);
+			ConfigBindings.Add(element,confInfos);
 		}
 
 		confInfos.Add(info);

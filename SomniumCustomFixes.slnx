@@ -39,6 +39,7 @@
     <Project Path="Loaders/MelonLoader/MelonLoader.shproj" Id="ef8f6d37-a8d2-4955-aabb-703fddf3713e" />
   </Folder>
   <Folder Name="/Misc./">
+    <File Path=".editorconfig" />
     <File Path="CommonProperties.props" />
     <File Path="Directory.Build.props" />
     <File Path="README.md" />
