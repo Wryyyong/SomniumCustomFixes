@@ -11,6 +11,7 @@ abstract class ConfigElement {
 	internal Action OnValueChangedNotify { get; set; }
 
 	internal abstract object GetLoaderConfigValue();
+	internal abstract void ResetToDefault();
 }
 
 sealed partial class ConfigElement<Type> : ConfigElement {
@@ -42,7 +43,7 @@ sealed partial class ConfigElement<Type> : ConfigElement {
 		) return;
 
 		if (Validator is not null)
-			value = (Type)Validator.EnsureValid(value);
+			value = Validator.EnsureValid(value);
 
 		_value = value;
 		ConfHandler.SetConfigValue(this,value);
@@ -54,6 +55,8 @@ sealed partial class ConfigElement<Type> : ConfigElement {
 	}
 
 	internal override object GetLoaderConfigValue() => ConfHandler.GetConfigValue(this);
+
+	internal override void ResetToDefault() => Value = DefaultValue;
 
 	internal ConfigElement(
 		string category,
