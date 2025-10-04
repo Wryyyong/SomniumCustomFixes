@@ -2,11 +2,21 @@
 
 	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);BEPIS</DefineConstants>
+
+		<BepInEx6_PrereleaseSuffix>*</BepInEx6_PrereleaseSuffix>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetGame)' == 'AI_TheSomniumFiles2'">
+		<BepInEx6_PrereleaseSuffix>649</BepInEx6_PrereleaseSuffix>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetGame)' == 'NoSleepForKanameDate'">
+		<BepInEx6_PrereleaseSuffix>700</BepInEx6_PrereleaseSuffix>
 	</PropertyGroup>
 
 	<!-- NuGet packages -->
 	<ItemGroup>
-		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
+		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.$(BepInEx6_PrereleaseSuffix)" IncludeAssets="compile" />
 	</ItemGroup>
 
 </Project>
