@@ -54,15 +54,14 @@ sealed class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 		SetCondition<Class,Value> setCondition = null
 	) {
 		var typeClass = Types.Class;
+
 		var property = typeClass.GetProperty(propertyName,AccessTools.all);
-
-		Setter = property.SetMethod;
-		Getter = property.GetMethod;
-
-		ArgumentNullException.ThrowIfNull(property);
-		ArgumentNullException.ThrowIfNull(Setter);
-
 		Property = property;
+		ArgumentNullException.ThrowIfNull(property);
+
+		Getter = property.GetMethod;
+		Setter = property.SetMethod;
+		ArgumentNullException.ThrowIfNull(Setter);
 
 		TargetValue = targetVal;
 
@@ -73,4 +72,6 @@ sealed class SettingInfo<Class,Value> : SettingInfo where Class : uObject {
 		CacheCondition = cacheCondition ?? Default_CacheConditional;
 		SetCondition = setCondition ?? Default_SetConditional;
 	}
+
+	~SettingInfo() => TypeData<Class,Value>.RemoveInfo(this);
 }

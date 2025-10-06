@@ -83,10 +83,12 @@ static class TypeData<Class,Value> where Class : uObject {
 	}
 
 	internal static void SetupInfo(SettingInfo<Class,Value> info,out bool doPatch) {
+		doPatch = false;
+
+		if (!info.DoTypeDataPatch) return;
+
 		doPatch = RegisteredTypes.Add(info.Types);
-
 		InfoData.TryAdd(info.Setter,info);
-
 		var element = info.ConfigElement;
 
 		if (element is null) return;
@@ -97,5 +99,17 @@ static class TypeData<Class,Value> where Class : uObject {
 		}
 
 		confInfos.Add(info);
+	}
+
+	internal static void RemoveInfo(SettingInfo<Class,Value> info) {
+		InfoData.Remove(info.Setter);
+		var element = info.ConfigElement;
+
+		if (
+			element is null
+		||	!ConfigBindings.TryGetValue(element,out var confInfos)
+		) return;
+
+		confInfos.Remove(info);
 	}
 }
