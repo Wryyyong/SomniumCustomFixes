@@ -1,5 +1,4 @@
-using Il2CppInterop.Runtime;
-
+using UnityEngine.Rendering;
 using URP = UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
@@ -21,6 +20,7 @@ namespace SomniumCustomFixes.Patches;
 [HarmonyPatch]
 static class QualityFixes {
 	// Stylistic preferences
+	static ConfigElement<bool> MotionBlur;
 	static ConfigElement<bool> RenderCharacterModelOutlines;
 
 	// Quality preferences
@@ -32,9 +32,12 @@ static class QualityFixes {
 	static ConfigElement<URP.AntialiasingMode> AntialiasingMode;
 	static ConfigElement<URP.AntialiasingQuality> SMAAQuality;
 
+	static BoolParameter BloomHighQualityFiltering;
+
 #if AINS
 	static ConfigElement<URP.TemporalAAQuality> TAAQuality;
 
+	static URP.DownscaleParameter BloomDownscale;
 	static URP.TemporalAA.Settings CustomTAASettings;
 #endif
 
@@ -61,6 +64,12 @@ static class QualityFixes {
 	#region Preferences Setup
 
 		// Stylistic preferences
+		MotionBlur = new(
+			"StylisticSettings",
+			"MotionBlur",
+			true
+		);
+
 		RenderCharacterModelOutlines = new(
 			"StylisticSettings",
 			"RenderCharacterModelOutlines",
@@ -141,6 +150,9 @@ static class QualityFixes {
 		AnisoMode.OnValueChangedNotify += RefreshAniso;
 		AnisoLevel.OnValueChangedNotify += RefreshAniso;
 
+		MotionBlur.OnValueChangedNotify += static () =>
+			RefreshSettings<VolumeComponent,bool>();
+
 		RenderCharacterModelOutlines.OnValueChangedNotify += static () =>
 			RefreshSettings<URP.ScriptableRendererFeature,bool>();
 
@@ -156,6 +168,8 @@ static class QualityFixes {
 		SMAAQuality.OnValueChangedNotify += static () =>
 			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingQuality>();
 
+		BloomHighQualityFiltering = new(true,true);
+
 	#if AINS
 		TAAQuality = new(
 			"QualitySettings",
@@ -165,6 +179,12 @@ static class QualityFixes {
 			"The level of quality to use for Temporal Anti-Aliasing."
 		+	$"\nHas no effect unless AntialiasingMode is set to \"{URP.AntialiasingMode.TemporalAntiAliasing}\"."
 		);
+
+		TAAQuality.OnValueChanged += static newVal => {
+			CustomTAASettings.m_Quality = newVal;
+
+			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingMode>();
+		};
 
 		CustomTAASettings = new() {
 		//	jitterFrameCountOffset = 0,
@@ -177,11 +197,7 @@ static class QualityFixes {
 		//	resetHistoryFrames = 0,
 		};
 
-		TAAQuality.OnValueChanged += static newVal => {
-			CustomTAASettings.m_Quality = newVal;
-
-			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingMode>();
-		};
+		BloomDownscale = new(URP.BloomDownscaleMode.Half,true);
 	#endif
 
 	#endregion
@@ -230,6 +246,21 @@ static class QualityFixes {
 			new SettingInfo<Light,LightShadows>(
 				nameof(Light.shadows),
 				LightShadows.Soft
+			),
+
+			new SettingInfo<ReflectionProbe,bool>(
+				nameof(ReflectionProbe.renderDynamicObjects),
+				true
+			),
+
+			new SettingInfo<Renderer,ShadowCastingMode>(
+				nameof(Renderer.shadowCastingMode),
+				ShadowCastingMode.TwoSided
+			),
+
+			new SettingInfo<SkinnedMeshRenderer,SkinQuality>(
+				nameof(SkinnedMeshRenderer.quality),
+				SkinQuality.Bone4
 			),
 
 			new SettingInfo<Texture,int>(
@@ -307,6 +338,11 @@ static class QualityFixes {
 				true
 			),
 
+			new SettingInfo<URP.Bloom,BoolParameter>(
+				nameof(URP.Bloom.highQualityFiltering),
+				BloomHighQualityFiltering
+			),
+
 			new SettingInfo<URP.ScriptableRendererFeature,bool>(
 				nameof(URP.ScriptableRendererFeature.m_Active),
 				RenderCharacterModelOutlines,
@@ -380,7 +416,29 @@ static class QualityFixes {
 				setCondition: static (obj,ref _) => obj.antialiasing is URP.AntialiasingMode.SubpixelMorphologicalAntiAliasing
 			),
 
+			new SettingInfo<VolumeComponent,bool>(
+				nameof(VolumeComponent.active),
+				MotionBlur,
+				cacheCondition: static (obj) => obj.TryCast<URP.MotionBlur>() is not null,
+				setCondition: static (obj,ref newVal) => {
+					var motionBlurObj = obj.TryCast<URP.MotionBlur>();
+
+					if (motionBlurObj is null)
+						return false;
+
+					if (newVal)
+						motionBlurObj.quality.value = URP.MotionBlurQuality.High;
+
+					return true;
+				}
+			),
+
 		#if AINS
+			new SettingInfo<URP.Bloom,URP.DownscaleParameter>(
+				nameof(URP.Bloom.downscale),
+				BloomDownscale
+			),
+
 			new SettingInfo<URP.UniversalRenderPipelineAsset,URP.SoftShadowQuality>(
 				nameof(URP.UniversalRenderPipelineAsset.softShadowQuality),
 				URP.SoftShadowQuality.High

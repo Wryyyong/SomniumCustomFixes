@@ -21,6 +21,10 @@ sealed partial class ConfigElement<Type> : ConfigElement {
 			"Render character model outlines"
 		),
 
+		["MotionBlur"] = new(
+			"Motion blur"
+		),
+
 		["AnisotropicFilteringMode"] = new(
 			"Anisotropic filtering mode",
 
