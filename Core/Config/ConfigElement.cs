@@ -73,7 +73,21 @@ sealed partial class ConfigElement<Type> : ConfigElement {
 	#if MELON
 		if (ConfigSets.TryGetValue(identifier,out var set)) {
 			LongName = set.LongName;
-			Description += "\n" + set.PossibleValues;
+
+			Description +=
+				(
+					string.IsNullOrWhiteSpace(Description)
+				?	string.Empty
+				:	"\n"
+			)
+			+	set.PossibleValues
+			;
+
+			if (string.IsNullOrWhiteSpace(LongName))
+				LongName = null;
+
+			if (string.IsNullOrWhiteSpace(Description))
+				Description = null;
 		}
 	#endif
 
