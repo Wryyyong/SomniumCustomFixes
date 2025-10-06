@@ -45,8 +45,8 @@
 			<HintPath>$(ExtAssemblyLoader)\Assembly-CSharp.stripped.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="Il2Cppmscorlib">
-			<HintPath>$(ExtAssemblyDir)\Il2Cppmscorlib.stripped.dll</HintPath>
+		<Reference Include="mscorlib">
+			<HintPath>$(ExtAssemblyDir)\mscorlib.stripped.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Unity.RenderPipelines.Universal.Runtime">
