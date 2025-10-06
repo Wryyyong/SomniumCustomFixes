@@ -15,5 +15,10 @@ abstract class ConfigHandler {
 
 	internal abstract void SaveConfig();
 
+	internal virtual void ResetConfig() {
+		foreach (var element in Elements.Values)
+			element.ResetToDefault();
+	}
+
 	internal virtual void OnAnyConfigChanged() {}
 }
