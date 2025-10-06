@@ -32,12 +32,9 @@ static class QualityFixes {
 	static ConfigElement<URP.AntialiasingMode> AntialiasingMode;
 	static ConfigElement<URP.AntialiasingQuality> SMAAQuality;
 
-	static BoolParameter BloomHighQualityFiltering;
-
 #if AINS
 	static ConfigElement<URP.TemporalAAQuality> TAAQuality;
 
-	static URP.DownscaleParameter BloomDownscale;
 	static URP.TemporalAA.Settings CustomTAASettings;
 #endif
 
@@ -168,8 +165,6 @@ static class QualityFixes {
 		SMAAQuality.OnValueChangedNotify += static () =>
 			RefreshSettings<URP.UniversalAdditionalCameraData,URP.AntialiasingQuality>();
 
-		BloomHighQualityFiltering = new(true,true);
-
 	#if AINS
 		TAAQuality = new(
 			"QualitySettings",
@@ -196,8 +191,6 @@ static class QualityFixes {
 			m_VarianceClampScale = .9f,
 		//	resetHistoryFrames = 0,
 		};
-
-		BloomDownscale = new(URP.BloomDownscaleMode.Half,true);
 	#endif
 
 	#endregion
@@ -338,11 +331,6 @@ static class QualityFixes {
 				true
 			),
 
-			new SettingInfo<URP.Bloom,BoolParameter>(
-				nameof(URP.Bloom.highQualityFiltering),
-				BloomHighQualityFiltering
-			),
-
 			new SettingInfo<URP.ScriptableRendererFeature,bool>(
 				nameof(URP.ScriptableRendererFeature.m_Active),
 				RenderCharacterModelOutlines,
@@ -434,11 +422,6 @@ static class QualityFixes {
 			),
 
 		#if AINS
-			new SettingInfo<URP.Bloom,URP.DownscaleParameter>(
-				nameof(URP.Bloom.downscale),
-				BloomDownscale
-			),
-
 			new SettingInfo<URP.UniversalRenderPipelineAsset,URP.SoftShadowQuality>(
 				nameof(URP.UniversalRenderPipelineAsset.softShadowQuality),
 				URP.SoftShadowQuality.High
