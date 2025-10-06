@@ -253,6 +253,10 @@ static class QualityFixes {
 				nameof(QualitySettings.anisotropicFiltering),
 				AnisoMode
 			),
+			new SettingInfo<QualitySettings,BlendWeights>(
+				nameof(QualitySettings.blendWeights),
+				BlendWeights.FourBones
+			),
 			new SettingInfo<QualitySettings,QualityLevel>(
 				nameof(QualitySettings.currentLevel),
 				QualityLevel.Fantastic
@@ -261,22 +265,18 @@ static class QualityFixes {
 				nameof(QualitySettings.lodBias),
 				100f
 			),
-			/*
 			new SettingInfo<QualitySettings,int>(
 				nameof(QualitySettings.particleRaycastBudget),
 				4096
 			),
-			*/
 			new SettingInfo<QualitySettings,int>(
 				nameof(QualitySettings.pixelLightCount),
 				DefaultPixelLights
 			),
-			/*
 			new SettingInfo<QualitySettings,ShadowQuality>(
 				nameof(QualitySettings.shadows),
 				ShadowQuality.All
 			),
-			*/
 			new SettingInfo<QualitySettings,int>(
 				nameof(QualitySettings.shadowCascades),
 				4
@@ -286,6 +286,10 @@ static class QualityFixes {
 				130f,
 				false
 			),
+			new SettingInfo<QualitySettings,ShadowmaskMode>(
+				nameof(QualitySettings.shadowmaskMode),
+				ShadowmaskMode.DistanceShadowmask
+			),
 			new SettingInfo<QualitySettings,ShadowProjection>(
 				nameof(QualitySettings.shadowProjection),
 				ShadowProjection.CloseFit
@@ -293,6 +297,10 @@ static class QualityFixes {
 			new SettingInfo<QualitySettings,ShadowResolution>(
 				nameof(QualitySettings.shadowResolution),
 				ShadowResolution.VeryHigh
+			),
+			new SettingInfo<QualitySettings,SkinWeights>(
+				nameof(QualitySettings.skinWeights),
+				SkinWeights.Unlimited
 			),
 			new SettingInfo<QualitySettings,bool>(
 				nameof(QualitySettings.softParticles),
